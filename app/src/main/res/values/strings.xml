@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gallery</string>
+
+    <string name="nav_photos">Ảnh</string>
+    <string name="nav_albums">Album</string>
+
+    <string name="permission_media_title">Cần quyền truy cập ảnh</string>
+    <string name="permission_media_rationale">Gallery cần quyền truy cập ảnh và video để hiển thị thư viện của bạn.</string>
+    <string name="permission_grant">Cấp quyền</string>
+
+    <string name="action_share">Chia sẻ</string>
+    <string name="action_edit">Chỉnh sửa</string>
+    <string name="action_delete">Xóa</string>
+    <string name="action_move">Di chuyển</string>
+    <string name="action_favorite">Yêu thích</string>
+    <string name="action_unfavorite">Bỏ yêu thích</string>
+    <string name="action_copy">Sao chép</string>
+    <string name="action_more">Thêm</string>
+    <string name="action_select_all">Chọn tất cả</string>
+    <string name="action_rename">Đổi tên</string>
+    <string name="action_details">Xem chi tiết</string>
+    <string name="action_set_wallpaper">Đặt làm hình nền</string>
+    <string name="action_set_contact_photo">Đặt làm ảnh liên hệ</string>
+    <string name="action_add_to_album">Thêm vào album</string>
+    <string name="action_secure_folder">Secure Folder</string>
+    <string name="action_collage">Ảnh ghép</string>
+    <string name="action_slideshow">Slideshow</string>
+    <string name="action_create_gif">Tạo GIF</string>
+    <string name="action_create_album">Tạo album mới</string>
+    <string name="action_restore">Khôi phục</string>
+    <string name="action_delete_forever">Xóa vĩnh viễn</string>
+
+    <string name="trash_title">Thùng rác</string>
+    <string name="trash_days_left">Còn %1$d ngày</string>
+    <string name="favorites_title">Yêu thích</string>
+    <string name="secure_folder_title">Secure Folder</string>
+    <string name="secure_folder_unlock">Xác thực để mở Secure Folder</string>
+
+    <string name="items_selected">Đã chọn %1$d</string>
+    <string name="empty_photos">Chưa có ảnh nào</string>
+    <string name="empty_albums">Chưa có album nào</string>
+    <string name="new_album_name_hint">Tên album</string>
+    <string name="cancel">Hủy</string>
+    <string name="save">Lưu</string>
+    <string name="create">Tạo</string>
+    <string name="rename">Đổi tên</string>
+    <string name="ok">OK</string>
+</resources>
