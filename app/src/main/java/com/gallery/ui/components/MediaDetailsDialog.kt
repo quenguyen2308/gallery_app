@@ -24,13 +24,13 @@ fun MediaDetailsDialog(item: MediaItem, onDismiss: () -> Unit) {
         text = {
             Column {
                 val dateFormat = remember { DateFormat.getDateTimeInstance() }
-                DetailRow("Ngày chụp", dateFormat.format(Date(item.dateTakenMillis)))
-                DetailRow("Kích thước", "${item.width} × ${item.height}")
-                DetailRow("Dung lượng", formatFileSize(item.sizeBytes))
-                DetailRow("Loại", item.mimeType)
-                DetailRow("Thư mục", item.bucketName)
+                DetailRow(stringResource(R.string.detail_date_taken), dateFormat.format(Date(item.dateTakenMillis)))
+                DetailRow(stringResource(R.string.detail_dimensions), "${item.width} × ${item.height}")
+                DetailRow(stringResource(R.string.detail_file_size), formatFileSize(item.sizeBytes))
+                DetailRow(stringResource(R.string.detail_type), item.mimeType)
+                DetailRow(stringResource(R.string.detail_folder), item.bucketName)
                 if (item.isVideo) {
-                    DetailRow("Thời lượng", formatDuration(item.durationMs))
+                    DetailRow(stringResource(R.string.detail_duration), formatDuration(item.durationMs))
                 }
             }
         },

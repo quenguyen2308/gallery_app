@@ -31,6 +31,9 @@
     <string name="action_slideshow">Slideshow</string>
     <string name="action_create_gif">Tạo GIF</string>
     <string name="action_create_album">Tạo album mới</string>
+    <string name="action_hide_albums">Ẩn album</string>
+    <string name="hide_albums_title">Ẩn album</string>
+    <string name="hide_albums_description">Chọn album muốn ẩn khỏi Gallery. Ảnh trong album đã ẩn cũng sẽ không hiển thị ở tab Ảnh. Để ẩn hoàn toàn khỏi mọi ứng dụng, hãy chuyển vào Secure Folder.</string>
     <string name="action_restore">Khôi phục</string>
     <string name="action_delete_forever">Xóa vĩnh viễn</string>
 
@@ -54,4 +57,101 @@
     <string name="create">Tạo</string>
     <string name="rename">Đổi tên</string>
     <string name="ok">OK</string>
+
+    <!-- Date grouping -->
+    <string name="date_today">Hôm nay</string>
+    <string name="date_yesterday">Hôm qua</string>
+
+    <!-- Photo count -->
+    <string name="photo_count">%1$d ảnh</string>
+
+    <!-- Media details -->
+    <string name="detail_date_taken">Ngày chụp</string>
+    <string name="detail_dimensions">Kích thước</string>
+    <string name="detail_file_size">Dung lượng</string>
+    <string name="detail_type">Loại</string>
+    <string name="detail_folder">Thư mục</string>
+    <string name="detail_duration">Thời lượng</string>
+
+    <!-- Editor -->
+    <string name="editor_undo">Hoàn tác</string>
+    <string name="editor_redo">Làm lại</string>
+    <string name="editor_tab_basic">Cơ bản</string>
+    <string name="editor_tool_crop">Cắt/Xoay</string>
+    <string name="editor_tool_adjust">Điều chỉnh</string>
+    <string name="editor_tool_filter">Bộ lọc</string>
+    <string name="editor_tool_erase">Xóa vật thể</string>
+    <string name="editor_tool_background">Nền</string>
+    <string name="editor_tool_enhance">Nâng cấp</string>
+    <string name="editor_tool_style">Phong cách</string>
+    <string name="editor_save_image">Lưu ảnh</string>
+    <string name="editor_save_confirm_message">Ghi đè lên ảnh gốc hay lưu thành một ảnh mới?</string>
+    <string name="editor_save_overwrite">Ghi đè</string>
+    <string name="editor_save_new_copy">Lưu bản mới</string>
+    <string name="msg_saved">Đã lưu</string>
+    <string name="msg_saved_new_copy">Đã lưu thành ảnh mới</string>
+
+    <!-- Adjust sliders -->
+    <string name="adjust_brightness">Độ sáng</string>
+    <string name="adjust_contrast">Tương phản</string>
+    <string name="adjust_saturation">Bão hòa</string>
+    <string name="adjust_sharpness">Độ nét</string>
+
+    <!-- Crop/Rotate -->
+    <string name="crop_rotate_left">Xoay trái</string>
+    <string name="crop_rotate_right">Xoay phải</string>
+    <string name="crop_flip_horizontal">Lật ngang</string>
+    <string name="crop_flip_vertical">Lật dọc</string>
+    <string name="crop_apply">Cắt</string>
+    <string name="crop_ratio_free">Tự do</string>
+
+    <!-- Filter -->
+    <string name="filter_intensity">Cường độ</string>
+    <string name="filter_none">Không</string>
+
+    <!-- AI Enhance -->
+    <string name="enhance_denoise">Khử nhiễu</string>
+    <string name="enhance_upscale">Nâng cấp</string>
+    <string name="enhance_max_quality">Chất lượng tối đa</string>
+    <string name="enhance_choose_level">Chọn mức độ nâng cấp</string>
+
+    <!-- Background Replace -->
+    <string name="bg_replace_label">Mô tả nền mới</string>
+    <string name="bg_replace_placeholder">VD: bãi biển hoàng hôn</string>
+    <string name="bg_replace_action">Thay nền</string>
+
+    <!-- Magic Eraser -->
+    <string name="erase_hint">Tô lên vùng cần xóa</string>
+    <string name="erase_action">Xóa vật thể</string>
+    <string name="erase_clear_strokes">Xóa nét vẽ</string>
+
+    <!-- Style Transfer -->
+    <string name="style_oil_painting">Sơn dầu</string>
+    <string name="style_sketch">Ký họa</string>
+    <string name="style_watercolor">Màu nước</string>
+
+    <!-- Feedback messages -->
+    <string name="msg_moved_to_trash">Đã chuyển vào thùng rác</string>
+    <string name="msg_deleted_forever">Đã xóa vĩnh viễn</string>
+    <string name="msg_rename_failed">Không thể đổi tên tệp này</string>
+    <string name="msg_moved_to_secure">Đã chuyển vào Secure Folder</string>
+    <string name="msg_collage_saved">Đã lưu ảnh ghép</string>
+    <string name="msg_collage_save_failed">Không thể lưu ảnh ghép</string>
+    <string name="msg_gif_saved">Đã lưu GIF</string>
+    <string name="msg_gif_save_failed">Không thể lưu GIF</string>
+    <string name="msg_cannot_open_image">Không thể mở ảnh để chỉnh sửa</string>
+    <string name="msg_network_required">Cần kết nối mạng để dùng AI Editing</string>
+
+    <!-- Collage / GIF screens -->
+    <string name="collage_save">Lưu ảnh ghép</string>
+    <string name="collage_error">Không thể tạo ảnh ghép</string>
+    <string name="gif_preview_size">Xem trước khung đầu tiên (%1$d KB)</string>
+    <string name="gif_save">Lưu GIF</string>
+    <string name="gif_error_min_frames">Cần ít nhất 2 ảnh để tạo GIF</string>
+
+    <!-- Processing overlay labels -->
+    <string name="processing_erasing">Đang xóa vật thể…</string>
+    <string name="processing_replacing_bg">Đang thay nền…</string>
+    <string name="processing_enhancing">Đang nâng cấp chất lượng…</string>
+    <string name="processing_applying_style">Đang áp dụng phong cách %1$s…</string>
 </resources>

@@ -16,11 +16,13 @@ import com.gallery.data.local.db.entity.EditHistoryEntity
 import com.gallery.data.local.db.entity.FavoriteEntity
 import com.gallery.data.local.db.entity.SecureItemEntity
 import com.gallery.data.local.db.entity.TrashEntity
+import com.gallery.data.local.HiddenAlbumsStore
 import com.gallery.data.local.mediastore.MediaFileOperations
 import com.gallery.data.local.mediastore.MediaStoreDataSource
 import com.gallery.data.local.secure.SecureStorage
 import com.gallery.domain.model.Album
 import com.gallery.domain.model.AlbumId
+import com.gallery.domain.model.storageKey
 import com.gallery.domain.model.MediaItem
 import com.gallery.domain.model.SecureMediaItem
 import com.gallery.domain.model.TrashItem
@@ -51,6 +53,7 @@ class MediaRepositoryImpl @Inject constructor(
     private val trashDao: TrashDao,
     private val secureItemDao: SecureItemDao,
     private val editHistoryDao: EditHistoryDao,
+    private val hiddenAlbumsStore: HiddenAlbumsStore,
 ) : MediaRepository {
 
     override fun observeMediaItems(): Flow<List<MediaItem>> = combine(
@@ -66,6 +69,27 @@ class MediaRepositoryImpl @Inject constructor(
             .filter { it.id !in trashSet && it.id !in secureSet }
             .map { it.copy(isFavorite = it.id in favSet) }
             .toList()
+    }.combine(hiddenAlbumFilter()) { items, (hiddenBuckets, hiddenMediaIds) ->
+        if (hiddenBuckets.isEmpty() && hiddenMediaIds.isEmpty()) items
+        else items.filter { it.bucketId !in hiddenBuckets && it.id !in hiddenMediaIds }
+    }
+
+    private fun hiddenAlbumFilter(): Flow<Pair<Set<String>, Set<Long>>> = combine(
+        hiddenAlbumsStore.hiddenKeys,
+        albumDao.observeAlbums(),
+        albumMediaDao.observeAll(),
+    ) { hiddenKeys, albums, mappings ->
+        if (hiddenKeys.isEmpty()) return@combine emptySet<String>() to emptySet()
+        val hiddenBuckets = hiddenKeys
+            .filter { it.startsWith("auto:") }
+            .mapTo(mutableSetOf()) { it.removePrefix("auto:") }
+        val hiddenCustomIds = albums
+            .filter { "custom:${it.id}" in hiddenKeys }
+            .mapTo(mutableSetOf()) { it.id }
+        val hiddenMediaIds = mappings
+            .filter { it.albumId in hiddenCustomIds }
+            .mapTo(mutableSetOf()) { it.mediaId }
+        hiddenBuckets to hiddenMediaIds
     }
 
     override fun observeMediaItem(mediaId: Long): Flow<MediaItem?> = combine(
@@ -237,6 +261,12 @@ class MediaRepositoryImpl @Inject constructor(
             val now = System.currentTimeMillis()
             albumMediaDao.insertAll(mediaIds.map { AlbumMediaEntity(toAlbumId, it, now) })
         }
+
+    override fun observeHiddenAlbumKeys(): kotlinx.coroutines.flow.Flow<Set<String>> = hiddenAlbumsStore.hiddenKeys
+
+    override suspend fun setAlbumHidden(id: AlbumId, hidden: Boolean) {
+        hiddenAlbumsStore.setHidden(id.storageKey(), hidden)
+    }
 
     override suspend fun renameMedia(mediaId: Long, newDisplayName: String): Boolean = withContext(Dispatchers.IO) {
         val media = mediaStoreDataSource.getMediaItem(mediaId) ?: return@withContext false

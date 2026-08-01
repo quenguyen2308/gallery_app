@@ -19,23 +19,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.ui.editor.EditorViewModel
 
 private data class EnhanceLevel(val level: Int, val label: String, val description: String)
-
-private val enhanceLevels = listOf(
-    EnhanceLevel(1, "x1", "Khử nhiễu"),
-    EnhanceLevel(2, "x2", "Nâng cấp"),
-    EnhanceLevel(3, "x3", "Chất lượng tối đa"),
-)
 
 @Composable
 fun AiEnhanceTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
     val baseBitmap by viewModel.baseBitmap.collectAsStateWithLifecycle()
     val bitmap = baseBitmap ?: return
     val imageBitmap = remember(bitmap) { bitmap.asImageBitmap() }
+
+    val denoiseLabel = stringResource(R.string.enhance_denoise)
+    val upscaleLabel = stringResource(R.string.enhance_upscale)
+    val maxQualityLabel = stringResource(R.string.enhance_max_quality)
+    val chooseLevel = stringResource(R.string.enhance_choose_level)
+    val enhanceLevels = remember(denoiseLabel, upscaleLabel, maxQualityLabel) {
+        listOf(
+            EnhanceLevel(1, "x1", denoiseLabel),
+            EnhanceLevel(2, "x2", upscaleLabel),
+            EnhanceLevel(3, "x3", maxQualityLabel),
+        )
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f).fillMaxWidth().background(Color.Black)) {
@@ -47,7 +55,7 @@ fun AiEnhanceTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
             )
         }
         Text(
-            "Chọn mức độ nâng cấp",
+            chooseLevel,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
         )

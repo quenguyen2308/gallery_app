@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.gallery.R
 import com.gallery.ui.GalleryViewModel
 
 @Composable
@@ -50,7 +52,7 @@ fun CollageScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ảnh ghép") },
+                title = { Text(stringResource(R.string.action_collage)) },
                 navigationIcon = {
                     IconButton(onClick = onDone) { Icon(Icons.Rounded.Close, contentDescription = null) }
                 },
@@ -76,9 +78,9 @@ fun CollageScreen(
                             onDone()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Lưu ảnh ghép") }
+                    ) { Text(stringResource(R.string.collage_save)) }
                 }
-                else -> Text("Không thể tạo ảnh ghép", modifier = Modifier.weight(1f))
+                else -> Text(stringResource(R.string.collage_error), modifier = Modifier.weight(1f))
             }
         }
     }

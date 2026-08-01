@@ -20,8 +20,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.ui.editor.EditorViewModel
 import kotlin.math.roundToInt
 
@@ -48,11 +50,11 @@ fun AdjustTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
             )
         }
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-            AdjustSlider("Độ sáng", params.brightness, -100f..100f, viewModel::updateBrightness)
-            AdjustSlider("Tương phản", params.contrast, -100f..100f, viewModel::updateContrast)
-            AdjustSlider("Bão hòa", params.saturation, -100f..100f, viewModel::updateSaturation)
+            AdjustSlider(stringResource(R.string.adjust_brightness), params.brightness, -100f..100f, viewModel::updateBrightness)
+            AdjustSlider(stringResource(R.string.adjust_contrast), params.contrast, -100f..100f, viewModel::updateContrast)
+            AdjustSlider(stringResource(R.string.adjust_saturation), params.saturation, -100f..100f, viewModel::updateSaturation)
             AdjustSlider(
-                label = "Độ nét",
+                label = stringResource(R.string.adjust_sharpness),
                 value = params.sharpness,
                 range = 0f..100f,
                 onValueChange = viewModel::updateSharpness,

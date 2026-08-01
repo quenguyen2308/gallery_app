@@ -33,9 +33,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.ui.editor.EditorViewModel
 
 @Composable
@@ -90,7 +92,7 @@ fun MagicEraserTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
         }
 
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-            Text("Tô lên vùng cần xóa", style = MaterialTheme.typography.labelSmall)
+            Text(stringResource(R.string.erase_hint), style = MaterialTheme.typography.labelSmall)
             Slider(
                 value = brushSizeDp,
                 onValueChange = { brushSizeDp = it },
@@ -113,11 +115,11 @@ fun MagicEraserTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
                 },
                 enabled = strokes.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text("Xóa vật thể") }
+            ) { Text(stringResource(R.string.erase_action)) }
         }
         if (strokes.isNotEmpty()) {
             TextButton(onClick = { strokes.clear() }, modifier = Modifier.fillMaxWidth()) {
-                Text("Xóa nét vẽ")
+                Text(stringResource(R.string.erase_clear_strokes))
             }
         }
     }

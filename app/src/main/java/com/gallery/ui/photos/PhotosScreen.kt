@@ -60,7 +60,8 @@ fun PhotosScreen(
     val mediaItems by viewModel.mediaItems.collectAsStateWithLifecycle()
     val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
-    val groups = remember(mediaItems) { groupMediaByDate(mediaItems) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val groups = remember(mediaItems) { groupMediaByDate(mediaItems, context) }
 
     MediaSelectionScaffold(
         viewModel = viewModel,
@@ -139,7 +140,7 @@ fun DateGroupHeader(
         Text(text = group.label, style = MaterialTheme.typography.titleLarge)
         androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "${group.items.size} ảnh",
+            text = stringResource(R.string.photo_count, group.items.size),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

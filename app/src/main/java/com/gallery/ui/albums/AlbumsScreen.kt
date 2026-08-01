@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PhotoAlbum
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ import coil3.compose.AsyncImage
 import com.gallery.R
 import com.gallery.domain.model.Album
 import com.gallery.domain.model.AlbumId
+import com.gallery.domain.model.storageKey
 import com.gallery.ui.GalleryViewModel
 import com.gallery.ui.components.FloatingBottomBarClearance
 import com.gallery.ui.components.TextInputDialog
@@ -64,11 +66,18 @@ fun AlbumsScreen(
     onOpenAlbum: (AlbumId) -> Unit,
     onOpenTrash: () -> Unit,
     onOpenSecureFolder: () -> Unit,
+    onOpenHideAlbums: () -> Unit,
 ) {
     val albums by viewModel.albums.collectAsStateWithLifecycle()
+    val hiddenKeys by viewModel.hiddenAlbumKeys.collectAsStateWithLifecycle()
     val trash by viewModel.trash.collectAsStateWithLifecycle()
     var showCreateDialog by remember { mutableStateOf(false) }
     var albumToRename by remember { mutableStateOf<Album?>(null) }
+    var showTopMenu by remember { mutableStateOf(false) }
+
+    val visibleAlbums = remember(albums, hiddenKeys) {
+        albums.filter { it.id.storageKey() !in hiddenKeys }
+    }
 
     Scaffold(
         topBar = {
@@ -84,8 +93,25 @@ fun AlbumsScreen(
                     IconButton(onClick = {}) {
                         Icon(Icons.Rounded.Search, contentDescription = null)
                     }
-                    IconButton(onClick = {}) {
-                        Icon(Icons.Rounded.MoreVert, contentDescription = null)
+                    Box {
+                        IconButton(onClick = { showTopMenu = true }) {
+                            Icon(Icons.Rounded.MoreVert, contentDescription = null)
+                        }
+                        DropdownMenu(
+                            expanded = showTopMenu,
+                            onDismissRequest = { showTopMenu = false },
+                        ) {
+                            DropdownMenuItem(
+                                leadingIcon = {
+                                    Icon(Icons.Rounded.VisibilityOff, contentDescription = null)
+                                },
+                                text = { Text(stringResource(R.string.action_hide_albums)) },
+                                onClick = {
+                                    showTopMenu = false
+                                    onOpenHideAlbums()
+                                },
+                            )
+                        }
                     }
                 },
             )
@@ -133,7 +159,7 @@ fun AlbumsScreen(
                 )
             }
 
-            items(albums, key = { it.id.toString() }) { album ->
+            items(visibleAlbums, key = { it.id.toString() }) { album ->
                 AlbumCard(
                     album = album,
                     onClick = { onOpenAlbum(album.id) },

@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.gallery.R
 import com.gallery.ui.GalleryViewModel
 
 @Composable
@@ -57,7 +59,7 @@ fun GifCreatorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tạo GIF") },
+                title = { Text(stringResource(R.string.action_create_gif)) },
                 navigationIcon = {
                     IconButton(onClick = onDone) { Icon(Icons.Rounded.Close, contentDescription = null) }
                 },
@@ -79,16 +81,16 @@ fun GifCreatorScreen(
                             modifier = Modifier.weight(1f).fillMaxWidth(),
                         )
                     }
-                    Text("Xem trước khung đầu tiên (${gifBytes!!.size / 1024} KB)")
+                    Text(stringResource(R.string.gif_preview_size, gifBytes!!.size / 1024))
                     Button(
                         onClick = {
                             viewModel.saveGif(gifBytes!!)
                             onDone()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                    ) { Text("Lưu GIF") }
+                    ) { Text(stringResource(R.string.gif_save)) }
                 }
-                else -> Text("Cần ít nhất 2 ảnh để tạo GIF", modifier = Modifier.weight(1f))
+                else -> Text(stringResource(R.string.gif_error_min_frames), modifier = Modifier.weight(1f))
             }
         }
     }

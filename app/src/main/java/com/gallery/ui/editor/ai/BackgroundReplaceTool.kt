@@ -19,8 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.ui.editor.EditorViewModel
 
 @Composable
@@ -43,15 +45,15 @@ fun BackgroundReplaceTool(viewModel: EditorViewModel, modifier: Modifier = Modif
             OutlinedTextField(
                 value = prompt,
                 onValueChange = { prompt = it },
-                label = { Text("Mô tả nền mới") },
-                placeholder = { Text("VD: bãi biển hoàng hôn") },
+                label = { Text(stringResource(R.string.bg_replace_label)) },
+                placeholder = { Text(stringResource(R.string.bg_replace_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
             )
             Button(
                 onClick = { viewModel.runBackgroundReplace(prompt.trim()) },
                 enabled = prompt.isNotBlank(),
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-            ) { Text("Thay nền") }
+            ) { Text(stringResource(R.string.bg_replace_action)) }
         }
     }
 }

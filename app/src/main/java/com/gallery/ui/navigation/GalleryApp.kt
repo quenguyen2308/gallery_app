@@ -6,7 +6,9 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,6 +30,7 @@ import com.gallery.ui.GalleryUiEvent
 import com.gallery.ui.GalleryViewModel
 import com.gallery.ui.albums.AlbumDetailScreen
 import com.gallery.ui.albums.AlbumsScreen
+import com.gallery.ui.albums.HideAlbumsScreen
 import com.gallery.ui.components.GalleryBottomNav
 import com.gallery.ui.favorites.FavoritesScreen
 import com.gallery.ui.photos.PhotosScreen
@@ -98,6 +101,13 @@ fun GalleryApp() {
                         onOpenAlbum = { albumId -> navController.navigate(GalleryDestinations.albumDetailRoute(albumId)) },
                         onOpenTrash = { navController.navigate(GalleryDestinations.TRASH) },
                         onOpenSecureFolder = { navController.navigate(GalleryDestinations.SECURE_FOLDER) },
+                        onOpenHideAlbums = { navController.navigate(GalleryDestinations.HIDE_ALBUMS) },
+                    )
+                }
+                composable(GalleryDestinations.HIDE_ALBUMS) {
+                    HideAlbumsScreen(
+                        viewModel = viewModel,
+                        onBack = { navController.popBackStack() },
                     )
                 }
                 composable(GalleryDestinations.ALBUM_DETAIL) { entry ->
@@ -171,7 +181,10 @@ fun GalleryApp() {
                 GalleryDestinations.FAVORITES,
             )
             if (!selectionMode && currentRoute in bottomNavRoutes) {
-                GalleryBottomNav(navController, modifier = Modifier.align(Alignment.BottomCenter))
+                GalleryBottomNav(
+                    navController,
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                )
             }
         }
     }

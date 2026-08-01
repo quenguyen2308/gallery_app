@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -49,8 +50,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.ui.components.FloatingBottomBar
 import com.gallery.ui.components.PillNavItem
 import com.gallery.ui.editor.ai.AiEnhanceTool
@@ -88,13 +91,15 @@ fun EditorScreen(
     val processingLabel by viewModel.processingLabel.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
+    val savedMsg = stringResource(R.string.msg_saved)
+    val savedNewMsg = stringResource(R.string.msg_saved_new_copy)
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
                 is EditorEvent.Message -> snackbarHostState.showSnackbar(event.text)
                 is EditorEvent.Saved -> {
-                    snackbarHostState.showSnackbar(if (event.overwritten) "Đã lưu" else "Đã lưu thành ảnh mới")
+                    snackbarHostState.showSnackbar(if (event.overwritten) savedMsg else savedNewMsg)
                     onSaved()
                 }
             }
@@ -114,7 +119,7 @@ fun EditorScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Chỉnh sửa") },
+                title = { Text(stringResource(R.string.action_edit)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
@@ -122,13 +127,13 @@ fun EditorScreen(
                 },
                 actions = {
                     IconButton(onClick = viewModel::undo, enabled = canUndo && !isBusy) {
-                        Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = "Hoàn tác")
+                        Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = stringResource(R.string.editor_undo))
                     }
                     IconButton(onClick = viewModel::redo, enabled = canRedo && !isBusy) {
-                        Icon(Icons.AutoMirrored.Rounded.Redo, contentDescription = "Làm lại")
+                        Icon(Icons.AutoMirrored.Rounded.Redo, contentDescription = stringResource(R.string.editor_redo))
                     }
                     IconButton(onClick = { showSaveOptions = true }, enabled = !isBusy && baseBitmap != null) {
-                        Icon(Icons.Rounded.Check, contentDescription = "Lưu")
+                        Icon(Icons.Rounded.Check, contentDescription = stringResource(R.string.save))
                     }
                 },
             )
@@ -147,7 +152,7 @@ fun EditorScreen(
                     Tab(
                         selected = topTab == EditorTopTab.BASIC,
                         onClick = { topTab = EditorTopTab.BASIC },
-                        text = { Text("Cơ bản") },
+                        text = { Text(stringResource(R.string.editor_tab_basic)) },
                     )
                     Tab(
                         selected = topTab == EditorTopTab.AI,
@@ -156,7 +161,7 @@ fun EditorScreen(
                     )
                 }
 
-                Box(modifier = Modifier.weight(1f).fillMaxSize()) {
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
                     if (topTab == EditorTopTab.AI) {
                         when (aiTool) {
                             AiTool.ERASER -> MagicEraserTool(viewModel = viewModel, modifier = Modifier.fillMaxSize())
@@ -172,55 +177,55 @@ fun EditorScreen(
                         }
                     }
                 }
+            }
 
-                if (topTab == EditorTopTab.BASIC) {
-                    FloatingBottomBar {
-                        PillNavItem(
-                            selected = basicTool == BasicTool.CROP,
-                            icon = Icons.Rounded.Crop,
-                            label = "Cắt/Xoay",
-                            onClick = { basicTool = BasicTool.CROP },
-                        )
-                        PillNavItem(
-                            selected = basicTool == BasicTool.ADJUST,
-                            icon = Icons.Rounded.Tune,
-                            label = "Điều chỉnh",
-                            onClick = { basicTool = BasicTool.ADJUST },
-                        )
-                        PillNavItem(
-                            selected = basicTool == BasicTool.FILTER,
-                            icon = Icons.Rounded.FilterVintage,
-                            label = "Bộ lọc",
-                            onClick = { basicTool = BasicTool.FILTER },
-                        )
-                    }
-                } else {
-                    FloatingBottomBar {
-                        PillNavItem(
-                            selected = aiTool == AiTool.ERASER,
-                            icon = Icons.Rounded.AutoFixHigh,
-                            label = "Xóa vật thể",
-                            onClick = { aiTool = AiTool.ERASER },
-                        )
-                        PillNavItem(
-                            selected = aiTool == AiTool.BACKGROUND,
-                            icon = Icons.Rounded.Wallpaper,
-                            label = "Nền",
-                            onClick = { aiTool = AiTool.BACKGROUND },
-                        )
-                        PillNavItem(
-                            selected = aiTool == AiTool.ENHANCE,
-                            icon = Icons.Rounded.HighQuality,
-                            label = "Nâng cấp",
-                            onClick = { aiTool = AiTool.ENHANCE },
-                        )
-                        PillNavItem(
-                            selected = aiTool == AiTool.STYLE,
-                            icon = Icons.Rounded.Palette,
-                            label = "Phong cách",
-                            onClick = { aiTool = AiTool.STYLE },
-                        )
-                    }
+            if (topTab == EditorTopTab.BASIC) {
+                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()) {
+                    PillNavItem(
+                        selected = basicTool == BasicTool.CROP,
+                        icon = Icons.Rounded.Crop,
+                        label = stringResource(R.string.editor_tool_crop),
+                        onClick = { basicTool = BasicTool.CROP },
+                    )
+                    PillNavItem(
+                        selected = basicTool == BasicTool.ADJUST,
+                        icon = Icons.Rounded.Tune,
+                        label = stringResource(R.string.editor_tool_adjust),
+                        onClick = { basicTool = BasicTool.ADJUST },
+                    )
+                    PillNavItem(
+                        selected = basicTool == BasicTool.FILTER,
+                        icon = Icons.Rounded.FilterVintage,
+                        label = stringResource(R.string.editor_tool_filter),
+                        onClick = { basicTool = BasicTool.FILTER },
+                    )
+                }
+            } else {
+                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()) {
+                    PillNavItem(
+                        selected = aiTool == AiTool.ERASER,
+                        icon = Icons.Rounded.AutoFixHigh,
+                        label = stringResource(R.string.editor_tool_erase),
+                        onClick = { aiTool = AiTool.ERASER },
+                    )
+                    PillNavItem(
+                        selected = aiTool == AiTool.BACKGROUND,
+                        icon = Icons.Rounded.Wallpaper,
+                        label = stringResource(R.string.editor_tool_background),
+                        onClick = { aiTool = AiTool.BACKGROUND },
+                    )
+                    PillNavItem(
+                        selected = aiTool == AiTool.ENHANCE,
+                        icon = Icons.Rounded.HighQuality,
+                        label = stringResource(R.string.editor_tool_enhance),
+                        onClick = { aiTool = AiTool.ENHANCE },
+                    )
+                    PillNavItem(
+                        selected = aiTool == AiTool.STYLE,
+                        icon = Icons.Rounded.Palette,
+                        label = stringResource(R.string.editor_tool_style),
+                        onClick = { aiTool = AiTool.STYLE },
+                    )
                 }
             }
 
@@ -242,13 +247,13 @@ fun EditorScreen(
                             .padding(horizontal = 24.dp, vertical = 20.dp),
                     ) {
                         Text(
-                            text = "Lưu ảnh",
+                            text = stringResource(R.string.editor_save_image),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Ghi đè lên ảnh gốc hay lưu thành một ảnh mới?",
+                            text = stringResource(R.string.editor_save_confirm_message),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -264,14 +269,14 @@ fun EditorScreen(
                             onClick = { showSaveOptions = false; viewModel.save(overwrite = true) },
                             modifier = Modifier.weight(1f),
                         ) {
-                            Text(text = "Ghi đè", fontWeight = FontWeight.Bold)
+                            Text(text = stringResource(R.string.editor_save_overwrite), fontWeight = FontWeight.Bold)
                         }
                         VerticalDivider(modifier = Modifier.fillMaxHeight())
                         TextButton(
                             onClick = { showSaveOptions = false; viewModel.save(overwrite = false) },
                             modifier = Modifier.weight(1f),
                         ) {
-                            Text(text = "Lưu bản mới", fontWeight = FontWeight.Bold)
+                            Text(text = stringResource(R.string.editor_save_new_copy), fontWeight = FontWeight.Bold)
                         }
                     }
                 }

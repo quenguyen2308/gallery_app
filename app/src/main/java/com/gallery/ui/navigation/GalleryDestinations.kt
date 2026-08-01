@@ -14,6 +14,7 @@ object GalleryDestinations {
     const val TRASH = "trash"
     const val SECURE_FOLDER = "secure"
     const val EDITOR = "editor/{mediaId}"
+    const val HIDE_ALBUMS = "hide_albums"
 
     fun albumDetailRoute(albumId: AlbumId) = "album/${encodeAlbumId(albumId)}"
     fun viewerRoute(mediaId: Long) = "viewer/$mediaId"

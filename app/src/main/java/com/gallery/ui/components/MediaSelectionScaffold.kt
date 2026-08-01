@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
@@ -106,8 +107,8 @@ fun MediaSelectionScaffold(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        scrolledContainerColor = MaterialTheme.colorScheme.background,
                     ),
                 )
             }
@@ -119,12 +120,10 @@ fun MediaSelectionScaffold(
                 SelectionActionBar(
                     isFavorite = isAllFavorite,
                     onShare = { shareMedia(context, selectedItems.map { it.uri }) },
-                    onMove = { pendingAlbumAction = PendingAlbumAction.MOVE },
                     onToggleFavorite = { viewModel.setFavorite(safeIds, !isAllFavorite) },
-                    onCopy = { pendingAlbumAction = PendingAlbumAction.COPY },
                     onDelete = { showDeleteConfirm = true },
                     onMore = { showAddSheet = true },
-                    modifier = Modifier.align(Alignment.BottomCenter),
+                    modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
                 )
             }
         }
@@ -142,6 +141,8 @@ fun MediaSelectionScaffold(
                 onSlideshow = { showSlideshow = true },
                 onCreateGif = { showGif = true },
                 onCreateAlbum = { showCreateAlbumForSelection = true },
+                onCopy = { pendingAlbumAction = PendingAlbumAction.COPY },
+                onMove = { pendingAlbumAction = PendingAlbumAction.MOVE },
                 onAddToAlbum = { pendingAlbumAction = PendingAlbumAction.ADD },
                 onSecureFolder = { viewModel.moveToSecureFolder(safeIds) },
                 onDelete = { showDeleteConfirm = true },
@@ -159,7 +160,7 @@ fun MediaSelectionScaffold(
     if (showRename) {
         selectedItems.firstOrNull()?.let { item ->
             TextInputDialog(
-                title = "Đổi tên",
+                title = stringResource(R.string.action_rename),
                 initialValue = item.displayName,
                 onDismiss = { showRename = false },
                 onConfirm = { name ->
@@ -172,9 +173,9 @@ fun MediaSelectionScaffold(
 
     if (showCreateAlbumForSelection) {
         TextInputDialog(
-            title = "Tạo album mới",
-            hint = "Tên album",
-            confirmLabel = "Tạo",
+            title = stringResource(R.string.action_create_album),
+            hint = stringResource(R.string.new_album_name_hint),
+            confirmLabel = stringResource(R.string.create),
             onDismiss = { showCreateAlbumForSelection = false },
             onConfirm = { name ->
                 viewModel.createAlbumFromSelection(name, safeIds)

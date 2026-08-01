@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gallery.R
 import com.gallery.domain.repository.EditSaveResult
 import com.gallery.domain.repository.GeminiRepository
 import com.gallery.domain.repository.GeminiResult
@@ -109,7 +110,7 @@ class EditorViewModel @Inject constructor(
                 }
             }
             if (bitmap == null) {
-                _events.send(EditorEvent.Message("Không thể mở ảnh để chỉnh sửa"))
+                _events.send(EditorEvent.Message(context.getString(R.string.msg_cannot_open_image)))
                 _isLoading.value = false
                 return@launch
             }
@@ -232,7 +233,7 @@ class EditorViewModel @Inject constructor(
 
     fun runMagicEraser(maskBitmap: Bitmap) = runGeminiOperation(
         cacheKeySuffix = "erase",
-        label = "Gemini đang xóa vật thể...",
+        label = context.getString(R.string.processing_erasing),
         prompt = "Remove the object marked in white on the second (mask) image from the first image. " +
             "Fill the erased area naturally so it blends seamlessly with the surrounding background. " +
             "Return only the edited photo, keeping everything else unchanged.",
@@ -241,14 +242,14 @@ class EditorViewModel @Inject constructor(
 
     fun runBackgroundReplace(prompt: String) = runGeminiOperation(
         cacheKeySuffix = "bg:$prompt",
-        label = "Gemini đang thay nền...",
+        label = context.getString(R.string.processing_replacing_bg),
         prompt = "Keep the main subject of this photo exactly as-is, and replace the background with: " +
             "$prompt. Blend lighting and edges naturally. Return only the edited photo.",
     )
 
     fun runAiEnhance(level: Int) = runGeminiOperation(
         cacheKeySuffix = "enhance:$level",
-        label = "Gemini đang nâng cấp chất lượng...",
+        label = context.getString(R.string.processing_enhancing),
         prompt = when (level) {
             1 -> "Denoise this photo and slightly improve clarity while keeping it fully realistic and unchanged in content."
             2 -> "Upscale and sharpen this photo, enhancing fine detail and clarity while keeping it fully realistic."
@@ -259,7 +260,7 @@ class EditorViewModel @Inject constructor(
 
     fun runStyleTransfer(styleLabel: String, stylePrompt: String) = runGeminiOperation(
         cacheKeySuffix = "style:$styleLabel",
-        label = "Gemini đang áp dụng phong cách $styleLabel...",
+        label = context.getString(R.string.processing_applying_style, styleLabel),
         prompt = "Redraw this photo in the following art style: $stylePrompt. Keep the composition and subject " +
             "recognizable. Return only the resulting image.",
     )
@@ -274,7 +275,7 @@ class EditorViewModel @Inject constructor(
         val base = _baseBitmap.value ?: return@launch
 
         if (!isNetworkAvailable(context)) {
-            _events.send(EditorEvent.Message("Cần kết nối mạng để dùng AI Editing"))
+            _events.send(EditorEvent.Message(context.getString(R.string.msg_network_required)))
             return@launch
         }
 

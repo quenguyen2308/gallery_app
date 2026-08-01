@@ -7,6 +7,11 @@ sealed interface AlbumId {
     data class Custom(val roomId: Long) : AlbumId
 }
 
+fun AlbumId.storageKey(): String = when (this) {
+    is AlbumId.Auto -> "auto:$bucketId"
+    is AlbumId.Custom -> "custom:$roomId"
+}
+
 data class Album(
     val id: AlbumId,
     val name: String,

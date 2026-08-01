@@ -1,16 +1,20 @@
 package com.gallery.ui
 
+import android.content.Context
 import android.content.IntentSender
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gallery.R
 import com.gallery.domain.model.Album
 import com.gallery.domain.model.AlbumId
+import com.gallery.domain.model.storageKey
 import com.gallery.domain.model.MediaItem
 import com.gallery.domain.model.SecureMediaItem
 import com.gallery.domain.model.TrashItem
 import com.gallery.domain.repository.DeleteResult
 import com.gallery.domain.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +33,7 @@ sealed interface GalleryUiEvent {
 
 @HiltViewModel
 class GalleryViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val repository: MediaRepository,
 ) : ViewModel() {
 
@@ -37,6 +42,9 @@ class GalleryViewModel @Inject constructor(
 
     val albums: StateFlow<List<Album>> = repository.observeAlbums()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val hiddenAlbumKeys: StateFlow<Set<String>> = repository.observeHiddenAlbumKeys()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
     val favorites: StateFlow<List<MediaItem>> = repository.observeFavorites()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -102,7 +110,7 @@ class GalleryViewModel @Inject constructor(
     fun moveToTrash(ids: Collection<Long>) = viewModelScope.launch {
         repository.moveToTrash(ids.toList())
         clearSelection()
-        _events.send(GalleryUiEvent.Message("Đã chuyển vào thùng rác"))
+        _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_trash)))
     }
 
     fun restoreFromTrash(ids: Collection<Long>) = viewModelScope.launch {
@@ -114,7 +122,7 @@ class GalleryViewModel @Inject constructor(
         when (val result = repository.deleteForever(ids.toList())) {
             is DeleteResult.Success -> {
                 clearSelection()
-                _events.send(GalleryUiEvent.Message("Đã xóa vĩnh viễn"))
+                _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_deleted_forever)))
             }
             is DeleteResult.RequiresConfirmation -> {
                 _events.send(GalleryUiEvent.RequestDeleteConfirmation(result.intentSender, ids.toList()))
@@ -128,6 +136,10 @@ class GalleryViewModel @Inject constructor(
     fun onDeleteConfirmed(ids: Collection<Long>) = viewModelScope.launch {
         repository.finalizeDelete(ids.toList())
         clearSelection()
+    }
+
+    fun setAlbumHidden(id: AlbumId, hidden: Boolean) = viewModelScope.launch {
+        repository.setAlbumHidden(id, hidden)
     }
 
     fun createAlbum(name: String) = viewModelScope.launch {
@@ -160,13 +172,13 @@ class GalleryViewModel @Inject constructor(
 
     fun renameMedia(mediaId: Long, newName: String) = viewModelScope.launch {
         val ok = repository.renameMedia(mediaId, newName)
-        if (!ok) _events.send(GalleryUiEvent.Message("Không thể đổi tên tệp này"))
+        if (!ok) _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_rename_failed)))
     }
 
     fun moveToSecureFolder(ids: Collection<Long>) = viewModelScope.launch {
         repository.moveToSecureFolder(ids.toList())
         clearSelection()
-        _events.send(GalleryUiEvent.Message("Đã chuyển vào Secure Folder"))
+        _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_secure)))
     }
 
     fun restoreFromSecureFolder(ids: Collection<Long>) = viewModelScope.launch {
@@ -179,12 +191,12 @@ class GalleryViewModel @Inject constructor(
     fun saveCollage(bitmap: android.graphics.Bitmap) = viewModelScope.launch {
         val name = "collage_${System.currentTimeMillis()}.jpg"
         val uri = repository.createImageFromBitmap(name, bitmap)
-        _events.send(GalleryUiEvent.Message(if (uri != null) "Đã lưu ảnh ghép" else "Không thể lưu ảnh ghép"))
+        _events.send(GalleryUiEvent.Message(context.getString(if (uri != null) R.string.msg_collage_saved else R.string.msg_collage_save_failed)))
     }
 
     fun saveGif(bytes: ByteArray) = viewModelScope.launch {
         val name = "gif_${System.currentTimeMillis()}.gif"
         val uri = repository.writeGifBytes(name, bytes)
-        _events.send(GalleryUiEvent.Message(if (uri != null) "Đã lưu GIF" else "Không thể lưu GIF"))
+        _events.send(GalleryUiEvent.Message(context.getString(if (uri != null) R.string.msg_gif_saved else R.string.msg_gif_save_failed)))
     }
 }

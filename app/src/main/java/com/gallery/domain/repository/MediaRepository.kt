@@ -55,6 +55,10 @@ interface MediaRepository {
     suspend fun restoreFromSecureFolder(mediaIds: List<Long>)
     suspend fun decryptSecureThumbnail(mediaId: Long): android.graphics.Bitmap?
 
+    // Hidden albums
+    fun observeHiddenAlbumKeys(): kotlinx.coroutines.flow.Flow<Set<String>>
+    suspend fun setAlbumHidden(id: AlbumId, hidden: Boolean)
+
     // Basic editor
     suspend fun saveEditedImage(
         originalMediaId: Long,

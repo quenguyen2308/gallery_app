@@ -28,8 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.ui.editor.EditorViewModel
 import com.gallery.ui.editor.FilterPreset
 import com.gallery.ui.editor.ImageEffects
@@ -46,6 +48,7 @@ fun FilterTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
     val thumbBitmap = remember(bitmap) {
         Bitmap.createScaledBitmap(bitmap, 72, 72, true).asImageBitmap()
     }
+    val filterNoneLabel = stringResource(R.string.filter_none)
 
     Column(modifier = modifier.fillMaxSize()) {
         Box(
@@ -66,9 +69,11 @@ fun FilterTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
         ) {
             items(FilterPreset.entries.toList()) { filter ->
+                val label = if (filter == FilterPreset.NONE) filterNoneLabel else filter.label
                 FilterThumbnail(
                     thumb = thumbBitmap,
                     filter = filter,
+                    label = label,
                     isSelected = filter == preset,
                     onClick = { viewModel.selectFilter(filter) },
                 )
@@ -77,7 +82,7 @@ fun FilterTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
 
         if (preset != FilterPreset.NONE) {
             Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                Text("Cường độ", style = MaterialTheme.typography.labelSmall)
+                Text(stringResource(R.string.filter_intensity), style = MaterialTheme.typography.labelSmall)
                 Slider(
                     value = intensity,
                     onValueChange = viewModel::updateFilterIntensity,
@@ -92,6 +97,7 @@ fun FilterTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
 private fun FilterThumbnail(
     thumb: androidx.compose.ui.graphics.ImageBitmap,
     filter: FilterPreset,
+    label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
@@ -104,7 +110,7 @@ private fun FilterThumbnail(
     ) {
         Image(
             bitmap = thumb,
-            contentDescription = filter.label,
+            contentDescription = label,
             contentScale = ContentScale.Crop,
             colorFilter = filterMatrix,
             modifier = Modifier
@@ -116,6 +122,6 @@ private fun FilterThumbnail(
                     shape = RoundedCornerShape(10.dp),
                 ),
         )
-        Text(filter.label, style = MaterialTheme.typography.labelSmall)
+        Text(label, style = MaterialTheme.typography.labelSmall)
     }
 }
