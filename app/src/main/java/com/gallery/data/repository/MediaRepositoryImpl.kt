@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val AUTO_ALBUM_BUCKET_NAMES = setOf("camera", "screenshots", "download", "downloads")
 private const val TRASH_RETENTION_DAYS = 30L
 
 @Singleton
@@ -330,9 +329,12 @@ class MediaRepositoryImpl @Inject constructor(
         EditSaveResult.Success(finalUri, overwritten = overwrittenUri != null)
     }
 
+    // Every distinct folder (MediaStore bucket) becomes a browsable auto-album — not just a
+    // hardcoded whitelist — so photos saved by other apps, or by this app's own Edit/Collage/GIF
+    // output folders, still show up somewhere in the Album tab instead of only in the unified
+    // Photos tab.
     private fun buildAutoAlbums(media: List<MediaItem>): List<Album> = media
         .groupBy { it.bucketId to it.bucketName }
-        .filterKeys { (_, name) -> name.lowercase() in AUTO_ALBUM_BUCKET_NAMES }
         .map { (key, items) ->
             val (bucketId, bucketName) = key
             Album(

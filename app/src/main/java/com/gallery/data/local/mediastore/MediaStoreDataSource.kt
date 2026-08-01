@@ -52,14 +52,18 @@ class MediaStoreDataSource @Inject constructor(
     }.map { queryMedia(mediaTypeSelection(), mediaTypeArgs()) }
 
     suspend fun getMediaItem(mediaId: Long): MediaItem? = withContext(Dispatchers.IO) {
-        val selection = "${mediaTypeSelection()} AND ${MediaStore.Files.FileColumns._ID} = ?"
+        // mediaTypeSelection() must be parenthesized: SQL binds AND tighter than OR, so without
+        // the parens this reads as "MEDIA_TYPE = image OR (MEDIA_TYPE = video AND _ID = ?)" —
+        // matching every single image row in the library regardless of the requested id.
+        val selection = "(${mediaTypeSelection()}) AND ${MediaStore.Files.FileColumns._ID} = ?"
         queryMedia(selection, mediaTypeArgs() + mediaId.toString()).firstOrNull()
     }
 
     suspend fun getMediaItems(mediaIds: List<Long>): List<MediaItem> = withContext(Dispatchers.IO) {
         if (mediaIds.isEmpty()) return@withContext emptyList()
         val placeholders = mediaIds.joinToString(",") { "?" }
-        val selection = "${mediaTypeSelection()} AND ${MediaStore.Files.FileColumns._ID} IN ($placeholders)"
+        // Same parenthesization fix as getMediaItem — see comment there.
+        val selection = "(${mediaTypeSelection()}) AND ${MediaStore.Files.FileColumns._ID} IN ($placeholders)"
         queryMedia(selection, mediaTypeArgs() + mediaIds.map { it.toString() })
     }
 
