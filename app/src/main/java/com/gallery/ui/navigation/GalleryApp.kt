@@ -1,6 +1,7 @@
 package com.gallery.ui.navigation
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,19 +16,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.unit.dp
-import com.gallery.ui.components.LocalNavBarBottom
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import com.gallery.ui.components.LocalNavBarBottom
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -55,6 +60,22 @@ fun GalleryApp() {
     val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingDeleteIds by remember { mutableStateOf<List<Long>>(emptyList()) }
+
+    val activity = LocalContext.current as? Activity
+    val scope = rememberCoroutineScope()
+    var backPressedOnce by remember { mutableStateOf(false) }
+    val rootRoutes = remember { setOf(GalleryDestinations.PHOTOS, GalleryDestinations.ALBUMS, GalleryDestinations.FAVORITES) }
+    BackHandler(enabled = currentRoute in rootRoutes) {
+        if (backPressedOnce) {
+            activity?.finish()
+        } else {
+            backPressedOnce = true
+            scope.launch {
+                snackbarHostState.showSnackbar("Nhấn Back một lần nữa để thoát")
+                backPressedOnce = false
+            }
+        }
+    }
 
     // Selection state (selectedIds/selectionMode) lives on the shared GalleryViewModel, not
     // per-screen, so without this a selection started on one screen (e.g. Photos) could still be
