@@ -8,22 +8,28 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+
+/**
+ * Nav bar bottom height captured at the root (GalleryApp) before any Scaffold can consume the
+ * insets. FloatingBottomBar reads from here instead of WindowInsets.navigationBars so all pill
+ * bars sit at the exact same Y regardless of how many nested Scaffolds wrap them.
+ */
+val LocalNavBarBottom = compositionLocalOf<Dp> { 0.dp }
 
 // ── Màu sắc pill bar ──────────────────────────────────────────────────────────
 /** Màu nền pill (thanh điều hướng nổi). */
@@ -57,10 +63,9 @@ fun FloatingBottomBar(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
+    val navBarBottom = LocalNavBarBottom.current
     Surface(
-        modifier = modifier
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(bottom = 16.dp),
+        modifier = modifier.padding(bottom = navBarBottom + 36.dp),
         shape = RoundedCornerShape(50),
         color = PillBg.copy(alpha = 0.96f),
         shadowElevation = 6.dp,
@@ -98,11 +103,11 @@ fun RowScope.PillNavItem(
 
     Box(
         modifier = Modifier
-            .padding(vertical = 5.dp, horizontal = 5.dp)
+            .padding(vertical = 5.dp, horizontal = 10.dp)
             .clip(RoundedCornerShape(50))
             .background(bgColor)
             .clickable(onClick = onClick)
-            .padding(vertical = 4.dp, horizontal = 15.dp),
+            .padding(vertical = 4.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -127,7 +132,7 @@ fun RowScope.PillActionItem(
             .padding(vertical = 5.dp, horizontal = 5.dp)
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(vertical = 4.dp, horizontal = 15.dp),
+            .padding(vertical = 4.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(

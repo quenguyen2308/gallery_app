@@ -1,6 +1,9 @@
 package com.gallery.ui.components
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -116,14 +119,18 @@ fun MediaSelectionScaffold(
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             content(padding)
-            if (selectionMode && selectedItems.isNotEmpty()) {
+            AnimatedVisibility(
+                visible = selectionMode && selectedItems.isNotEmpty(),
+                modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
                 SelectionActionBar(
                     isFavorite = isAllFavorite,
                     onShare = { shareMedia(context, selectedItems.map { it.uri }) },
                     onToggleFavorite = { viewModel.setFavorite(safeIds, !isAllFavorite) },
                     onDelete = { showDeleteConfirm = true },
                     onMore = { showAddSheet = true },
-                    modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
                 )
             }
         }

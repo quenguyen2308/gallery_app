@@ -43,7 +43,13 @@
     <string name="confirm_delete_forever_message">%1$d mục sẽ bị xóa vĩnh viễn và không thể khôi phục.</string>
 
     <string name="trash_title">Thùng rác</string>
-    <string name="trash_days_left">Còn %1$d ngày</string>
+    <string name="trash_subtitle">%1$d ảnh</string>
+    <string name="trash_days_left">%1$d ngày</string>
+    <string name="trash_info">Thùng rác chứa các mục đã xóa từ Thư viện và một số ứng dụng khác. Các mục sẽ bị xóa vĩnh viễn sau 30 ngày.</string>
+    <string name="action_empty_trash">Xóa thùng rác</string>
+    <string name="action_select">Chọn</string>
+    <string name="confirm_empty_trash_title">Xóa thùng rác?</string>
+    <string name="confirm_empty_trash_message">Tất cả %1$d mục sẽ bị xóa vĩnh viễn và không thể khôi phục.</string>
     <string name="favorites_title">Yêu thích</string>
     <string name="secure_folder_title">Secure Folder</string>
     <string name="secure_folder_unlock">Xác thực để mở Secure Folder</string>

@@ -4,12 +4,20 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.unit.dp
+import com.gallery.ui.components.LocalNavBarBottom
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -74,17 +82,22 @@ fun GalleryApp() {
         }
     }
 
+    // Read nav bar height before any Scaffold can consume the insets, then provide it to all
+    // FloatingBottomBar descendants via LocalNavBarBottom so every pill sits at the same Y.
+    val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+
     // GalleryBottomNav is an overlay (not the Scaffold `bottomBar` slot) so the grid beneath it
     // isn't clipped short — content scrolls fully behind the floating pill instead of stopping
     // at a solid-background gap the size of the reserved bottomBar area.
-    Scaffold(
+    CompositionLocalProvider(LocalNavBarBottom provides navBarBottom) {
+        Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
                 startDestination = GalleryDestinations.PHOTOS,
-                modifier = Modifier.padding(padding),
+                modifier = Modifier.padding(top = padding.calculateTopPadding()),
             ) {
                 composable(GalleryDestinations.PHOTOS) {
                     PhotosScreen(
@@ -180,12 +193,16 @@ fun GalleryApp() {
                 GalleryDestinations.ALBUMS,
                 GalleryDestinations.FAVORITES,
             )
-            if (!selectionMode && currentRoute in bottomNavRoutes) {
-                GalleryBottomNav(
-                    navController,
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                )
+            val showBottomNav = !selectionMode && currentRoute in bottomNavRoutes
+            AnimatedVisibility(
+                visible = showBottomNav,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                GalleryBottomNav(navController)
             }
         }
+    }
     }
 }

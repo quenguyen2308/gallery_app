@@ -1,13 +1,18 @@
 package com.gallery.ui.trash
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -15,12 +20,17 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,9 +62,6 @@ fun TrashScreen(
     val trashItems by viewModel.trash.collectAsStateWithLifecycle()
     val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
-    // selectedIds is shared across every screen; intersect with this screen's own ids before any
-    // destructive call (especially deleteForever, which is permanent) so a stale id from another
-    // screen can never slip through here.
     val safeIds = remember(trashItems, selectedIds) {
         val trashIds = trashItems.map { it.media.id }.toSet()
         selectedIds.filterTo(mutableSetOf()) { it in trashIds }
@@ -62,6 +69,8 @@ fun TrashScreen(
 
     BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
     var showDeleteForeverConfirm by remember { mutableStateOf(false) }
+    var showEmptyTrashConfirm by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -73,27 +82,87 @@ fun TrashScreen(
                 )
             } else {
                 TopAppBar(
-                    title = { Text(stringResource(R.string.trash_title)) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null) }
+                    title = {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.trash_title),
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                            if (trashItems.isNotEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.trash_subtitle, trashItems.size),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
                     },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
+                        }
+                    },
+                    actions = {
+                        if (trashItems.isNotEmpty()) {
+                            TextButton(onClick = { viewModel.enterSelection(trashItems.first().media.id) }) {
+                                Text(stringResource(R.string.action_select))
+                            }
+                        }
+                        Box {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(Icons.Rounded.MoreVert, contentDescription = null)
+                            }
+                            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.action_empty_trash)) },
+                                    enabled = trashItems.isNotEmpty(),
+                                    onClick = {
+                                        showMenu = false
+                                        showEmptyTrashConfirm = true
+                                    },
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        scrolledContainerColor = MaterialTheme.colorScheme.background,
+                    ),
                 )
             }
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             if (trashItems.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(padding),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Text(stringResource(R.string.empty_photos))
                 }
             } else {
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
+                    columns = GridCells.Fixed(3),
                     modifier = Modifier.fillMaxSize().padding(padding),
-                    contentPadding = PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = FloatingBottomBarClearance),
+                    contentPadding = PaddingValues(
+                        start = 6.dp,
+                        top = 6.dp,
+                        end = 6.dp,
+                        bottom = FloatingBottomBarClearance,
+                    ),
                     horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp),
                     verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(4.dp),
                 ) {
+                    item(key = "trash_info", span = { androidx.compose.foundation.lazy.grid.GridItemSpan(maxLineSpan) }) {
+                        Text(
+                            text = stringResource(R.string.trash_info),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 6.dp, vertical = 12.dp),
+                        )
+                    }
                     items(trashItems, key = { it.media.id }) { trashItem ->
                         TrashThumbnail(
                             trashItem = trashItem,
@@ -112,11 +181,15 @@ fun TrashScreen(
                 }
             }
 
-            if (selectionMode && safeIds.isNotEmpty()) {
+            AnimatedVisibility(
+                visible = selectionMode && safeIds.isNotEmpty(),
+                modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
                 TrashSelectionActionBar(
                     onRestore = { viewModel.restoreFromTrash(safeIds) },
                     onDeleteForever = { showDeleteForeverConfirm = true },
-                    modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
                 )
             }
         }
@@ -129,6 +202,19 @@ fun TrashScreen(
             confirmLabel = stringResource(R.string.action_delete_forever),
             onDismiss = { showDeleteForeverConfirm = false },
             onConfirm = { viewModel.deleteForever(safeIds) },
+        )
+    }
+
+    if (showEmptyTrashConfirm) {
+        ConfirmDialog(
+            title = stringResource(R.string.confirm_empty_trash_title),
+            message = stringResource(R.string.confirm_empty_trash_message, trashItems.size),
+            confirmLabel = stringResource(R.string.action_delete_forever),
+            onDismiss = { showEmptyTrashConfirm = false },
+            onConfirm = {
+                val allIds = trashItems.map { it.media.id }.toSet()
+                viewModel.deleteForever(allIds)
+            },
         )
     }
 }
@@ -168,11 +254,11 @@ private fun TrashThumbnail(
             color = androidx.compose.ui.graphics.Color.White,
             style = MaterialTheme.typography.labelSmall,
             modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(6.dp)
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 8.dp)
                 .clip(MaterialTheme.shapes.small)
                 .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.45f))
-                .padding(horizontal = 6.dp, vertical = 2.dp),
+                .padding(horizontal = 8.dp, vertical = 3.dp),
         )
         if (selectionMode) {
             SelectionDot(

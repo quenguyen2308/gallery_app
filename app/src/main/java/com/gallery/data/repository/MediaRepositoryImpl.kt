@@ -364,6 +364,7 @@ class MediaRepositoryImpl @Inject constructor(
     // output folders, still show up somewhere in the Album tab instead of only in the unified
     // Photos tab.
     private fun buildAutoAlbums(media: List<MediaItem>): List<Album> = media
+        .filter { it.bucketName.isNotBlank() }
         .groupBy { it.bucketId to it.bucketName }
         .map { (key, items) ->
             val (bucketId, bucketName) = key
