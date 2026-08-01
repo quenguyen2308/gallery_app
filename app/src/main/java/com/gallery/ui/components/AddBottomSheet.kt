@@ -6,6 +6,7 @@ import androidx.compose.material.icons.rounded.Animation
 import androidx.compose.material.icons.rounded.Contacts
 import androidx.compose.material.icons.rounded.CreateNewFolder
 import androidx.compose.material.icons.rounded.Dashboard
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Lock
@@ -32,6 +33,7 @@ data class AddSheetActions(
     val onCreateAlbum: () -> Unit = {},
     val onAddToAlbum: () -> Unit = {},
     val onSecureFolder: () -> Unit = {},
+    val onDelete: () -> Unit = {},
 )
 
 @Composable

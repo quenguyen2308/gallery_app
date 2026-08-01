@@ -1,38 +1,39 @@
 package com.gallery.ui.albums
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PhotoAlbum
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,8 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -57,68 +62,86 @@ import com.gallery.ui.components.TextInputDialog
 fun AlbumsScreen(
     viewModel: GalleryViewModel,
     onOpenAlbum: (AlbumId) -> Unit,
-    onOpenFavorites: () -> Unit,
     onOpenTrash: () -> Unit,
     onOpenSecureFolder: () -> Unit,
 ) {
     val albums by viewModel.albums.collectAsStateWithLifecycle()
+    val trash by viewModel.trash.collectAsStateWithLifecycle()
     var showCreateDialog by remember { mutableStateOf(false) }
     var albumToRename by remember { mutableStateOf<Album?>(null) }
 
     Scaffold(
         topBar = {
-            androidx.compose.material3.TopAppBar(
-                title = { Text(stringResource(R.string.nav_albums), style = MaterialTheme.typography.titleLarge) },
-                colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+            TopAppBar(
+                title = {},
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
                 ),
+                actions = {
+                    IconButton(onClick = { showCreateDialog = true }) {
+                        Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.action_create_album))
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Rounded.Search, contentDescription = null)
+                    }
+                    IconButton(onClick = {}) {
+                        Icon(Icons.Rounded.MoreVert, contentDescription = null)
+                    }
+                },
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showCreateDialog = true }) {
-                Icon(Icons.Rounded.Add, contentDescription = stringResource(R.string.action_create_album))
-            }
         },
     ) { padding ->
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                start = 12.dp, top = 12.dp, end = 12.dp, bottom = FloatingBottomBarClearance,
+            columns = GridCells.Fixed(3),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                end = 12.dp,
+                bottom = FloatingBottomBarClearance,
             ),
-            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.large,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-                ) {
-                    PinnedAlbumRow(Icons.Rounded.Favorite, stringResource(R.string.favorites_title), onOpenFavorites)
-                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerHighest)
-                    PinnedAlbumRow(Icons.Rounded.Delete, stringResource(R.string.trash_title), onOpenTrash)
-                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceContainerHighest)
-                    PinnedAlbumRow(Icons.Rounded.Lock, stringResource(R.string.secure_folder_title), onOpenSecureFolder)
-                }
+                Text(
+                    text = stringResource(R.string.all_albums),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
+                )
             }
-            if (albums.isEmpty()) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                        Text(stringResource(R.string.empty_albums))
-                    }
-                }
-            } else {
-                items(albums, key = { it.id.toString() }) { album ->
-                    AlbumCard(
-                        album = album,
-                        onClick = { onOpenAlbum(album.id) },
-                        onRename = { albumToRename = album },
-                        onDelete = {
-                            if (album.id is AlbumId.Custom) viewModel.deleteAlbum(album.id.roomId)
-                        },
-                    )
-                }
+
+            item {
+                SystemAlbumCard(
+                    name = stringResource(R.string.trash_title),
+                    itemCount = trash.size,
+                    coverUri = trash.firstOrNull()?.media?.uri,
+                    icon = Icons.Rounded.Delete,
+                    onClick = onOpenTrash,
+                )
+            }
+
+            item {
+                SystemAlbumCard(
+                    name = stringResource(R.string.secure_folder_title),
+                    itemCount = 0,
+                    coverUri = null,
+                    icon = Icons.Rounded.Lock,
+                    onClick = onOpenSecureFolder,
+                )
+            }
+
+            items(albums, key = { it.id.toString() }) { album ->
+                AlbumCard(
+                    album = album,
+                    onClick = { onOpenAlbum(album.id) },
+                    onRename = { albumToRename = album },
+                    onDelete = {
+                        if (album.id is AlbumId.Custom) viewModel.deleteAlbum(album.id.roomId)
+                    },
+                )
             }
         }
     }
@@ -151,15 +174,66 @@ fun AlbumsScreen(
 }
 
 @Composable
-private fun PinnedAlbumRow(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
-    ListItem(
-        headlineContent = { Text(label) },
-        leadingContent = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
-        colors = ListItemDefaults.colors(containerColor = androidx.compose.ui.graphics.Color.Transparent),
+private fun SystemAlbumCard(
+    name: String,
+    itemCount: Int,
+    coverUri: android.net.Uri?,
+    icon: ImageVector,
+    onClick: () -> Unit,
+) {
+    Box(
         modifier = Modifier
             .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick),
-    )
+    ) {
+        if (coverUri != null) {
+            AsyncImage(
+                model = coverUri,
+                contentDescription = name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                modifier = Modifier
+                    .size(44.dp)
+                    .align(Alignment.Center),
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        0.45f to Color.Transparent,
+                        1.0f to Color.Black.copy(alpha = 0.65f),
+                    )
+                ),
+        )
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(8.dp),
+        ) {
+            Text(
+                text = name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+            )
+            Text(
+                text = "$itemCount",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.85f),
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -171,51 +245,73 @@ private fun AlbumCard(
     onDelete: () -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    Card(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = { if (album.id is AlbumId.Custom) showMenu = true },
             ),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
+        if (album.coverUri != null) {
+            AsyncImage(
+                model = album.coverUri,
+                contentDescription = album.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Rounded.PhotoAlbum,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                modifier = Modifier
+                    .size(44.dp)
+                    .align(Alignment.Center),
+            )
+        }
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        0.45f to Color.Transparent,
+                        1.0f to Color.Black.copy(alpha = 0.65f),
+                    )
+                ),
+        )
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(8.dp),
         ) {
-            if (album.coverUri != null) {
-                AsyncImage(
-                    model = album.coverUri,
-                    contentDescription = album.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                Icon(
-                    Icons.Rounded.PhotoAlbum,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize().padding(32.dp),
-                )
-            }
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(text = { Text(stringResource(R.string.action_rename)) }, onClick = { showMenu = false; onRename() })
-                DropdownMenuItem(text = { Text(stringResource(R.string.action_delete)) }, onClick = { showMenu = false; onDelete() })
-            }
+            Text(
+                text = album.name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+            )
+            Text(
+                text = "${album.itemCount}",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.85f),
+            )
         }
-        Text(
-            album.name,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp).padding(bottom = 0.dp),
-        )
-        Text(
-            "${album.itemCount} ảnh",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp).padding(bottom = 10.dp),
-        )
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_rename)) },
+                onClick = { showMenu = false; onRename() },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.action_delete)) },
+                onClick = { showMenu = false; onDelete() },
+            )
+        }
     }
 }

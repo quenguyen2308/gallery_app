@@ -160,12 +160,21 @@ fun PhotoThumbnail(
         animationSpec = tween(150),
         label = "thumbnailScale",
     )
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
 
     Box(
         modifier = Modifier
             .aspectRatio(1f)
             .clip(ThumbnailShape)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    if (!selectionMode) {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    }
+                    onLongClick()
+                },
+            ),
     ) {
         AsyncImage(
             model = item.uri,

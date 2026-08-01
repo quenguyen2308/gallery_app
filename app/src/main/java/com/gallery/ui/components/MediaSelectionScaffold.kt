@@ -21,7 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.gallery.R
 import com.gallery.domain.model.AlbumId
 import com.gallery.domain.model.MediaItem
 import com.gallery.ui.GalleryViewModel
@@ -55,7 +57,12 @@ fun MediaSelectionScaffold(
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
     val albums by viewModel.albums.collectAsStateWithLifecycle()
 
+    // Every mutating call below uses `safeIds` (selectedItems' own ids), never the raw
+    // `selectedIds` from the ViewModel directly: selectedIds is shared across every screen, so if
+    // it ever retains an id from a screen the user was on moments ago, this filters it out before
+    // it can reach a delete/move/favorite call and touch media that was never shown here.
     val selectedItems = remember(items, selectedIds) { items.filter { it.id in selectedIds } }
+    val safeIds = remember(selectedItems) { selectedItems.map { it.id }.toSet() }
     val isAllFavorite = selectedItems.isNotEmpty() && selectedItems.all { it.isFavorite }
 
     BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
@@ -68,17 +75,18 @@ fun MediaSelectionScaffold(
     var showCollage by remember { mutableStateOf(false) }
     var showGif by remember { mutableStateOf(false) }
     var showSlideshow by remember { mutableStateOf(false) }
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     if (showSlideshow) {
         SlideshowScreen(items = selectedItems, onClose = { showSlideshow = false })
         return
     }
     if (showCollage) {
-        CollageScreen(viewModel = viewModel, mediaIds = selectedIds.toList(), onDone = { showCollage = false; viewModel.clearSelection() })
+        CollageScreen(viewModel = viewModel, mediaIds = safeIds.toList(), onDone = { showCollage = false; viewModel.clearSelection() })
         return
     }
     if (showGif) {
-        GifCreatorScreen(viewModel = viewModel, mediaIds = selectedIds.toList(), onDone = { showGif = false; viewModel.clearSelection() })
+        GifCreatorScreen(viewModel = viewModel, mediaIds = safeIds.toList(), onDone = { showGif = false; viewModel.clearSelection() })
         return
     }
 
@@ -111,10 +119,10 @@ fun MediaSelectionScaffold(
                 SelectionActionBar(
                     isFavorite = isAllFavorite,
                     onShare = { shareMedia(context, selectedItems.map { it.uri }) },
-                    onDelete = { viewModel.moveToTrash(selectedIds) },
                     onMove = { pendingAlbumAction = PendingAlbumAction.MOVE },
-                    onToggleFavorite = { viewModel.setFavorite(selectedIds, !isAllFavorite) },
+                    onToggleFavorite = { viewModel.setFavorite(safeIds, !isAllFavorite) },
                     onCopy = { pendingAlbumAction = PendingAlbumAction.COPY },
+                    onDelete = { showDeleteConfirm = true },
                     onMore = { showAddSheet = true },
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
@@ -135,7 +143,8 @@ fun MediaSelectionScaffold(
                 onCreateGif = { showGif = true },
                 onCreateAlbum = { showCreateAlbumForSelection = true },
                 onAddToAlbum = { pendingAlbumAction = PendingAlbumAction.ADD },
-                onSecureFolder = { viewModel.moveToSecureFolder(selectedIds) },
+                onSecureFolder = { viewModel.moveToSecureFolder(safeIds) },
+                onDelete = { showDeleteConfirm = true },
             ),
             onDismiss = { showAddSheet = false },
         )
@@ -168,7 +177,7 @@ fun MediaSelectionScaffold(
             confirmLabel = "Tạo",
             onDismiss = { showCreateAlbumForSelection = false },
             onConfirm = { name ->
-                viewModel.createAlbumFromSelection(name, selectedIds)
+                viewModel.createAlbumFromSelection(name, safeIds)
                 showCreateAlbumForSelection = false
             },
         )
@@ -176,25 +185,41 @@ fun MediaSelectionScaffold(
 
     pendingAlbumAction?.let { action ->
         val mode = if (action == PendingAlbumAction.ADD) AlbumPickerMode.MULTI else AlbumPickerMode.SINGLE
+        val title = when (action) {
+            PendingAlbumAction.ADD -> stringResource(R.string.action_add_to_album)
+            PendingAlbumAction.COPY -> stringResource(R.string.action_copy_to_album)
+            PendingAlbumAction.MOVE -> stringResource(R.string.action_move_to_album)
+        }
         AlbumPickerDialog(
             albums = albums,
             mode = mode,
+            title = title,
             onDismiss = { pendingAlbumAction = null },
             onConfirm = { targetAlbumIds ->
                 when (action) {
-                    PendingAlbumAction.ADD -> targetAlbumIds.forEach { viewModel.addToAlbum(it, selectedIds) }
-                    PendingAlbumAction.COPY -> targetAlbumIds.firstOrNull()?.let { viewModel.addToAlbum(it, selectedIds) }
+                    PendingAlbumAction.ADD -> targetAlbumIds.forEach { viewModel.addToAlbum(it, safeIds) }
+                    PendingAlbumAction.COPY -> targetAlbumIds.firstOrNull()?.let { viewModel.addToAlbum(it, safeIds) }
                     PendingAlbumAction.MOVE -> targetAlbumIds.firstOrNull()?.let { target ->
                         if (currentAlbumId != null) {
-                            viewModel.moveToAlbum(currentAlbumId, target, selectedIds)
+                            viewModel.moveToAlbum(currentAlbumId, target, safeIds)
                         } else {
-                            viewModel.addToAlbum(target, selectedIds)
+                            viewModel.addToAlbum(target, safeIds)
                         }
                     }
                 }
                 pendingAlbumAction = null
             },
             onCreateNew = { showCreateAlbumForSelection = true },
+        )
+    }
+
+    if (showDeleteConfirm) {
+        ConfirmDialog(
+            title = stringResource(R.string.confirm_move_to_trash_title),
+            message = stringResource(R.string.confirm_move_to_trash_message, safeIds.size),
+            confirmLabel = stringResource(R.string.action_delete),
+            onDismiss = { showDeleteConfirm = false },
+            onConfirm = { viewModel.moveToTrash(safeIds) },
         )
     }
 }

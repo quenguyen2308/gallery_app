@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gallery</string>
+    <string name="app_name">MyGallery</string>
 
     <string name="nav_photos">Ảnh</string>
     <string name="nav_albums">Album</string>
+    <string name="all_albums">Tất cả album</string>
 
     <string name="permission_media_title">Cần quyền truy cập ảnh</string>
     <string name="permission_media_rationale">Gallery cần quyền truy cập ảnh và video để hiển thị thư viện của bạn.</string>
@@ -23,6 +24,8 @@
     <string name="action_set_wallpaper">Đặt làm hình nền</string>
     <string name="action_set_contact_photo">Đặt làm ảnh liên hệ</string>
     <string name="action_add_to_album">Thêm vào album</string>
+    <string name="action_copy_to_album">Sao chép vào album</string>
+    <string name="action_move_to_album">Di chuyển vào album</string>
     <string name="action_secure_folder">Secure Folder</string>
     <string name="action_collage">Ảnh ghép</string>
     <string name="action_slideshow">Slideshow</string>
@@ -30,6 +33,11 @@
     <string name="action_create_album">Tạo album mới</string>
     <string name="action_restore">Khôi phục</string>
     <string name="action_delete_forever">Xóa vĩnh viễn</string>
+
+    <string name="confirm_move_to_trash_title">Chuyển vào thùng rác?</string>
+    <string name="confirm_move_to_trash_message">%1$d mục sẽ được chuyển vào thùng rác. Bạn có thể khôi phục trong vòng 30 ngày.</string>
+    <string name="confirm_delete_forever_title">Xóa vĩnh viễn?</string>
+    <string name="confirm_delete_forever_message">%1$d mục sẽ bị xóa vĩnh viễn và không thể khôi phục.</string>
 
     <string name="trash_title">Thùng rác</string>
     <string name="trash_days_left">Còn %1$d ngày</string>

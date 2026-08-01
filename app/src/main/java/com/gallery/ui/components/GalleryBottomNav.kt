@@ -1,6 +1,7 @@
 package com.gallery.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.PhotoAlbum
 import androidx.compose.runtime.Composable
@@ -35,6 +36,17 @@ fun GalleryBottomNav(navController: NavController, modifier: Modifier = Modifier
             label = stringResource(R.string.nav_albums),
             onClick = {
                 navController.navigate(GalleryDestinations.ALBUMS) {
+                    popUpTo(GalleryDestinations.PHOTOS)
+                    launchSingleTop = true
+                }
+            },
+        )
+        PillNavItem(
+            selected = currentRoute == GalleryDestinations.FAVORITES,
+            icon = Icons.Rounded.Favorite,
+            label = stringResource(R.string.favorites_title),
+            onClick = {
+                navController.navigate(GalleryDestinations.FAVORITES) {
                     popUpTo(GalleryDestinations.PHOTOS)
                     launchSingleTop = true
                 }

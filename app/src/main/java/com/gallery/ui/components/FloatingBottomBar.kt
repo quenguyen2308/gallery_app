@@ -11,9 +11,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -26,17 +27,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
-// The bar itself is always a dark translucent capsule (regardless of system theme), so icon tints
-// are fixed light tones for contrast rather than switching with light/dark theme. The capsule tone
-// is a soft charcoal (not pure black) so it reads a touch lighter/warmer instead of stark black.
-private val PillTone = Color(0xFF3A3A38)
-private val ActiveColor = Color(0xFFFFFFFF)
-private val InactiveColor = Color(0xFFD8D5CC)
+// The bar itself is always a rice-milk (sữa gạo) translucent capsule regardless of system theme,
+// so icon tints are fixed dark tones for contrast against that light cream rather than switching
+// with light/dark theme.
+// Pill bar is a few shades darker than the rice-milk screen background (0xFFF3E8D2) so it
+// visually floats rather than blending into the page.
+private val PillTone = Color(0xFFE5CEAB)
+private val ActiveColor = Color(0xFF3A3A38)
+private val InactiveColor = Color(0xFF8C8572)
 
-// Each icon sits on its own small dark circle within the shared capsule so the active tab still
-// reads clearly heavier than inactive ones. Active is 20 points darker than inactive.
-private val IconBackgroundInactive = PillTone.copy(alpha = 0.40f)
-private val IconBackgroundActive = PillTone.copy(alpha = 0.60f)
+// Active tab gets a translucent dark-gray overlay pill; inactive tabs have no fill.
+private val IconBackgroundInactive = Color.Transparent
+private val IconBackgroundActive = Color(0x26000000)
 
 /**
  * FloatingBottomBar is rendered as an overlay (not a Scaffold `bottomBar` slot) so scrollable
@@ -45,6 +47,9 @@ private val IconBackgroundActive = PillTone.copy(alpha = 0.60f)
  * can still be scrolled clear of the bar instead of staying stuck behind it.
  */
 val FloatingBottomBarClearance = 96.dp
+
+// Pill icon size reduced to ~75% of the original 22dp.
+private val IconSize = 17.dp
 
 /**
  * Fully transparent pill shared by every bottom bar in the app (nav, selection, editor tools):
@@ -62,12 +67,12 @@ fun FloatingBottomBar(
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(bottom = 20.dp),
         shape = RoundedCornerShape(50),
-        color = PillTone.copy(alpha = 0.35f),
-        shadowElevation = 0.dp,
+        color = PillTone.copy(alpha = 0.92f),
+        shadowElevation = 4.dp,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically,
             content = content,
         )
@@ -95,17 +100,21 @@ fun RowScope.PillNavItem(
 
     Box(
         modifier = Modifier
-            .padding(horizontal = 4.dp, vertical = 4.dp)
+            .padding(horizontal = 3.dp, vertical = 5.dp)
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(horizontal = 10.dp, vertical = 4.dp),
+            .padding(horizontal = 7.dp, vertical = 5.dp),
         contentAlignment = Alignment.Center,
     ) {
         Box(
-            modifier = Modifier.size(36.dp).clip(CircleShape).background(iconBackground),
+            modifier = Modifier
+                .width(IconSize * 2)
+                .height(IconSize)
+                .clip(RoundedCornerShape(50))
+                .background(iconBackground),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, contentDescription = label, tint = contentColor, modifier = Modifier.size(22.dp))
+            Icon(icon, contentDescription = label, tint = contentColor, modifier = Modifier.size(IconSize))
         }
     }
 }
@@ -119,21 +128,25 @@ fun RowScope.PillActionItem(
 ) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 4.dp, vertical = 4.dp)
+            .padding(horizontal = 3.dp, vertical = 5.dp)
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(vertical = 4.dp),
+            .padding(vertical = 5.dp),
         contentAlignment = Alignment.Center,
     ) {
         Box(
-            modifier = Modifier.size(36.dp).clip(CircleShape).background(IconBackgroundInactive),
+            modifier = Modifier
+                .width(IconSize * 2)
+                .height(IconSize)
+                .clip(RoundedCornerShape(50))
+                .background(IconBackgroundActive),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 icon,
                 contentDescription = contentDescription,
                 tint = ActiveColor,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(IconSize),
             )
         }
     }

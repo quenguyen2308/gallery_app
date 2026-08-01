@@ -16,18 +16,31 @@ import androidx.compose.material.icons.rounded.HighQuality
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Wallpaper
 import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -216,20 +229,53 @@ fun EditorScreen(
     }
 
     if (showSaveOptions) {
-        AlertDialog(
-            onDismissRequest = { showSaveOptions = false },
-            title = { Text("Lưu ảnh") },
-            text = { Text("Ghi đè lên ảnh gốc hay lưu thành một ảnh mới?") },
-            confirmButton = {
-                TextButton(onClick = { showSaveOptions = false; viewModel.save(overwrite = false) }) {
-                    Text("Lưu bản mới")
+        Dialog(onDismissRequest = { showSaveOptions = false }) {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 6.dp,
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 20.dp),
+                    ) {
+                        Text(
+                            text = "Lưu ảnh",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Ghi đè lên ảnh gốc hay lưu thành một ảnh mới?",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    HorizontalDivider()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        TextButton(
+                            onClick = { showSaveOptions = false; viewModel.save(overwrite = true) },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(text = "Ghi đè", fontWeight = FontWeight.Bold)
+                        }
+                        VerticalDivider(modifier = Modifier.fillMaxHeight())
+                        TextButton(
+                            onClick = { showSaveOptions = false; viewModel.save(overwrite = false) },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(text = "Lưu bản mới", fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSaveOptions = false; viewModel.save(overwrite = true) }) {
-                    Text("Ghi đè")
-                }
-            },
-        )
+            }
+        }
     }
 }

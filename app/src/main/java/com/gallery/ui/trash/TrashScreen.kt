@@ -22,6 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +36,7 @@ import coil3.compose.AsyncImage
 import com.gallery.R
 import com.gallery.domain.model.TrashItem
 import com.gallery.ui.GalleryViewModel
+import com.gallery.ui.components.ConfirmDialog
 import com.gallery.ui.components.FloatingBottomBarClearance
 import com.gallery.ui.photos.SelectionDot
 import com.gallery.ui.selection.SelectionTopBar
@@ -47,8 +51,16 @@ fun TrashScreen(
     val trashItems by viewModel.trash.collectAsStateWithLifecycle()
     val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
+    // selectedIds is shared across every screen; intersect with this screen's own ids before any
+    // destructive call (especially deleteForever, which is permanent) so a stale id from another
+    // screen can never slip through here.
+    val safeIds = remember(trashItems, selectedIds) {
+        val trashIds = trashItems.map { it.media.id }.toSet()
+        selectedIds.filterTo(mutableSetOf()) { it in trashIds }
+    }
 
     BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
+    var showDeleteForeverConfirm by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -99,14 +111,24 @@ fun TrashScreen(
                 }
             }
 
-            if (selectionMode && selectedIds.isNotEmpty()) {
+            if (selectionMode && safeIds.isNotEmpty()) {
                 TrashSelectionActionBar(
-                    onRestore = { viewModel.restoreFromTrash(selectedIds) },
-                    onDeleteForever = { viewModel.deleteForever(selectedIds) },
+                    onRestore = { viewModel.restoreFromTrash(safeIds) },
+                    onDeleteForever = { showDeleteForeverConfirm = true },
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
             }
         }
+    }
+
+    if (showDeleteForeverConfirm) {
+        ConfirmDialog(
+            title = stringResource(R.string.confirm_delete_forever_title),
+            message = stringResource(R.string.confirm_delete_forever_message, safeIds.size),
+            confirmLabel = stringResource(R.string.action_delete_forever),
+            onDismiss = { showDeleteForeverConfirm = false },
+            onConfirm = { viewModel.deleteForever(safeIds) },
+        )
     }
 }
 
@@ -119,11 +141,20 @@ private fun TrashThumbnail(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     Box(
         modifier = Modifier
             .aspectRatio(1f)
             .clip(ThumbnailShape)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    if (!selectionMode) {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    }
+                    onLongClick()
+                },
+            ),
     ) {
         AsyncImage(
             model = trashItem.media.uri,

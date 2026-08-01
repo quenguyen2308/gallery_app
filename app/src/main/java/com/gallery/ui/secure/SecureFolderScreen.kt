@@ -82,6 +82,12 @@ fun SecureFolderScreen(
     val secureItems by viewModel.secureItems.collectAsStateWithLifecycle()
     val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
+    // selectedIds is shared across every screen; intersect with this screen's own ids before any
+    // destructive call so a stale id from another screen can never slip through here.
+    val safeIds = remember(secureItems, selectedIds) {
+        val secureIds = secureItems.map { it.mediaId }.toSet()
+        selectedIds.filterTo(mutableSetOf()) { it in secureIds }
+    }
 
     BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
 
@@ -135,9 +141,9 @@ fun SecureFolderScreen(
                 }
             }
 
-            if (selectionMode && selectedIds.isNotEmpty()) {
+            if (selectionMode && safeIds.isNotEmpty()) {
                 com.gallery.ui.selection.SecureSelectionActionBar(
-                    onRestore = { viewModel.restoreFromSecureFolder(selectedIds) },
+                    onRestore = { viewModel.restoreFromSecureFolder(safeIds) },
                     modifier = Modifier.align(Alignment.BottomCenter),
                 )
             }
@@ -159,13 +165,22 @@ private fun SecureThumbnail(
     LaunchedEffect(item.mediaId) {
         bitmap = decryptThumbnail()
     }
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
 
     Box(
         modifier = Modifier
             .aspectRatio(1f)
             .clip(ThumbnailShape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = {
+                    if (!selectionMode) {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                    }
+                    onLongClick()
+                },
+            ),
     ) {
         val currentBitmap = bitmap
         if (currentBitmap != null) {

@@ -9,7 +9,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material.icons.rounded.MoreHoriz
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.MoveToInbox
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Restore
@@ -58,24 +58,24 @@ fun SelectionTopBar(
 fun SelectionActionBar(
     isFavorite: Boolean,
     onShare: () -> Unit,
-    onDelete: () -> Unit,
     onMove: () -> Unit,
     onToggleFavorite: () -> Unit,
     onCopy: () -> Unit,
+    onDelete: () -> Unit,
     onMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FloatingBottomBar(modifier = modifier) {
         PillActionItem(Icons.Rounded.Share, stringResource(R.string.action_share), onShare)
-        PillActionItem(Icons.Rounded.Delete, stringResource(R.string.action_delete), onDelete)
-        PillActionItem(Icons.Rounded.MoveToInbox, stringResource(R.string.action_move), onMove)
         PillActionItem(
             icon = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
             contentDescription = stringResource(R.string.action_favorite),
             onClick = onToggleFavorite,
         )
         PillActionItem(Icons.Rounded.ContentCopy, stringResource(R.string.action_copy), onCopy)
-        PillActionItem(Icons.Rounded.MoreHoriz, stringResource(R.string.action_more), onMore)
+        PillActionItem(Icons.Rounded.MoveToInbox, stringResource(R.string.action_move), onMove)
+        PillActionItem(Icons.Rounded.Delete, stringResource(R.string.action_delete), onDelete)
+        PillActionItem(Icons.Rounded.MoreVert, stringResource(R.string.action_more), onMore)
     }
 }
 

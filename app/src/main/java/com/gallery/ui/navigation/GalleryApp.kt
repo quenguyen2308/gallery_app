@@ -45,6 +45,12 @@ fun GalleryApp() {
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingDeleteIds by remember { mutableStateOf<List<Long>>(emptyList()) }
 
+    // Selection state (selectedIds/selectionMode) lives on the shared GalleryViewModel, not
+    // per-screen, so without this a selection started on one screen (e.g. Photos) could still be
+    // active — and get unioned with a fresh "select all" — after navigating to another screen
+    // (e.g. Trash), causing deletes to hit media the user never intended to touch there.
+    LaunchedEffect(currentRoute) { viewModel.clearSelection() }
+
     val deleteLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
     ) { result ->
@@ -90,7 +96,6 @@ fun GalleryApp() {
                     AlbumsScreen(
                         viewModel = viewModel,
                         onOpenAlbum = { albumId -> navController.navigate(GalleryDestinations.albumDetailRoute(albumId)) },
-                        onOpenFavorites = { navController.navigate(GalleryDestinations.FAVORITES) },
                         onOpenTrash = { navController.navigate(GalleryDestinations.TRASH) },
                         onOpenSecureFolder = { navController.navigate(GalleryDestinations.SECURE_FOLDER) },
                     )
@@ -160,7 +165,12 @@ fun GalleryApp() {
                 }
             }
 
-            if (!selectionMode && (currentRoute == GalleryDestinations.PHOTOS || currentRoute == GalleryDestinations.ALBUMS)) {
+            val bottomNavRoutes = setOf(
+                GalleryDestinations.PHOTOS,
+                GalleryDestinations.ALBUMS,
+                GalleryDestinations.FAVORITES,
+            )
+            if (!selectionMode && currentRoute in bottomNavRoutes) {
                 GalleryBottomNav(navController, modifier = Modifier.align(Alignment.BottomCenter))
             }
         }
