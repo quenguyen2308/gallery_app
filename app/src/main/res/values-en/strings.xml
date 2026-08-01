@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyGallery</string>
+
+    <string name="nav_photos">Photos</string>
+    <string name="nav_albums">Albums</string>
+    <string name="all_albums">All albums</string>
+
+    <string name="permission_media_title">Media access required</string>
+    <string name="permission_media_rationale">Gallery needs access to photos and videos to display your library.</string>
+    <string name="permission_grant">Grant permission</string>
+
+    <string name="action_share">Share</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_move">Move</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_unfavorite">Unfavorite</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_more">More</string>
+    <string name="action_select_all">Select all</string>
+    <string name="action_rename">Rename</string>
+    <string name="action_details">View details</string>
+    <string name="action_set_wallpaper">Set as wallpaper</string>
+    <string name="action_set_contact_photo">Set as contact photo</string>
+    <string name="action_add_to_album">Add to album</string>
+    <string name="action_copy_to_album">Copy to album</string>
+    <string name="action_move_to_album">Move to album</string>
+    <string name="action_secure_folder">Secure Folder</string>
+    <string name="action_collage">Collage</string>
+    <string name="action_slideshow">Slideshow</string>
+    <string name="action_create_gif">Create GIF</string>
+    <string name="action_create_album">Create new album</string>
+    <string name="action_hide_albums">Hide albums</string>
+    <string name="hide_albums_title">Hide albums</string>
+    <string name="hide_albums_description">Select albums to hide from Gallery. Photos in hidden albums will also not appear in the Photos tab. To hide completely from all apps, move them to Secure Folder.</string>
+    <string name="action_restore">Restore</string>
+    <string name="action_delete_forever">Delete forever</string>
+
+    <string name="confirm_move_to_trash_title">Move to trash?</string>
+    <string name="confirm_move_to_trash_message">%1$d item(s) will be moved to trash. You can restore them within 30 days.</string>
+    <string name="confirm_delete_forever_title">Delete forever?</string>
+    <string name="confirm_delete_forever_message">%1$d item(s) will be permanently deleted and cannot be recovered.</string>
+
+    <string name="trash_title">Trash</string>
+    <string name="trash_days_left">%1$d days left</string>
+    <string name="favorites_title">Favorites</string>
+    <string name="secure_folder_title">Secure Folder</string>
+    <string name="secure_folder_unlock">Authenticate to open Secure Folder</string>
+
+    <string name="items_selected">%1$d selected</string>
+    <string name="empty_photos">No photos yet</string>
+    <string name="empty_albums">No albums yet</string>
+    <string name="new_album_name_hint">Album name</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="create">Create</string>
+    <string name="rename">Rename</string>
+    <string name="ok">OK</string>
+
+    <!-- Date grouping -->
+    <string name="date_today">Today</string>
+    <string name="date_yesterday">Yesterday</string>
+
+    <!-- Photo count -->
+    <string name="photo_count">%1$d photos</string>
+
+    <!-- Media details -->
+    <string name="detail_date_taken">Date taken</string>
+    <string name="detail_dimensions">Dimensions</string>
+    <string name="detail_file_size">File size</string>
+    <string name="detail_type">Type</string>
+    <string name="detail_folder">Folder</string>
+    <string name="detail_duration">Duration</string>
+
+    <!-- Editor -->
+    <string name="editor_undo">Undo</string>
+    <string name="editor_redo">Redo</string>
+    <string name="editor_tab_basic">Basic</string>
+    <string name="editor_tool_crop">Crop/Rotate</string>
+    <string name="editor_tool_adjust">Adjust</string>
+    <string name="editor_tool_filter">Filter</string>
+    <string name="editor_tool_erase">Erase</string>
+    <string name="editor_tool_background">Background</string>
+    <string name="editor_tool_enhance">Enhance</string>
+    <string name="editor_tool_style">Style</string>
+    <string name="editor_save_image">Save image</string>
+    <string name="editor_save_confirm_message">Overwrite the original or save as a new image?</string>
+    <string name="editor_save_overwrite">Overwrite</string>
+    <string name="editor_save_new_copy">Save new</string>
+    <string name="msg_saved">Saved</string>
+    <string name="msg_saved_new_copy">Saved as new image</string>
+
+    <!-- Adjust sliders -->
+    <string name="adjust_brightness">Brightness</string>
+    <string name="adjust_contrast">Contrast</string>
+    <string name="adjust_saturation">Saturation</string>
+    <string name="adjust_sharpness">Sharpness</string>
+
+    <!-- Crop/Rotate -->
+    <string name="crop_rotate_left">Rotate left</string>
+    <string name="crop_rotate_right">Rotate right</string>
+    <string name="crop_flip_horizontal">Flip horizontal</string>
+    <string name="crop_flip_vertical">Flip vertical</string>
+    <string name="crop_apply">Crop</string>
+    <string name="crop_ratio_free">Free</string>
+
+    <!-- Filter -->
+    <string name="filter_intensity">Intensity</string>
+    <string name="filter_none">None</string>
+
+    <!-- AI Enhance -->
+    <string name="enhance_denoise">Denoise</string>
+    <string name="enhance_upscale">Enhance</string>
+    <string name="enhance_max_quality">Max quality</string>
+    <string name="enhance_choose_level">Select enhancement level</string>
+
+    <!-- Background Replace -->
+    <string name="bg_replace_label">Describe new background</string>
+    <string name="bg_replace_placeholder">E.g.: sunset beach</string>
+    <string name="bg_replace_action">Replace background</string>
+
+    <!-- Magic Eraser -->
+    <string name="erase_hint">Draw over the area to erase</string>
+    <string name="erase_action">Erase object</string>
+    <string name="erase_clear_strokes">Clear drawing</string>
+
+    <!-- Style Transfer -->
+    <string name="style_oil_painting">Oil painting</string>
+    <string name="style_sketch">Sketch</string>
+    <string name="style_watercolor">Watercolor</string>
+
+    <!-- Feedback messages -->
+    <string name="msg_moved_to_trash">Moved to trash</string>
+    <string name="msg_deleted_forever">Permanently deleted</string>
+    <string name="msg_rename_failed">Cannot rename this file</string>
+    <string name="msg_moved_to_secure">Moved to Secure Folder</string>
+    <string name="msg_collage_saved">Collage saved</string>
+    <string name="msg_collage_save_failed">Failed to save collage</string>
+    <string name="msg_gif_saved">GIF saved</string>
+    <string name="msg_gif_save_failed">Failed to save GIF</string>
+    <string name="msg_cannot_open_image">Cannot open image for editing</string>
+    <string name="msg_network_required">Internet connection required for AI Editing</string>
+
+    <!-- Collage / GIF screens -->
+    <string name="collage_save">Save collage</string>
+    <string name="collage_error">Cannot create collage</string>
+    <string name="gif_preview_size">Preview first frame (%1$d KB)</string>
+    <string name="gif_save">Save GIF</string>
+    <string name="gif_error_min_frames">Need at least 2 photos to create a GIF</string>
+
+    <!-- Processing overlay labels -->
+    <string name="processing_erasing">Erasing object…</string>
+    <string name="processing_replacing_bg">Replacing background…</string>
+    <string name="processing_enhancing">Enhancing quality…</string>
+    <string name="processing_applying_style">Applying %1$s style…</string>
+</resources>
