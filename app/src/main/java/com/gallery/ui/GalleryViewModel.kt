@@ -64,6 +64,11 @@ class GalleryViewModel @Inject constructor(
     private val _viewerItems = MutableStateFlow<List<MediaItem>>(emptyList())
     val viewerItems: StateFlow<List<MediaItem>> = _viewerItems.asStateFlow()
 
+    private val _albumsGridView = MutableStateFlow(true)
+    val albumsGridView: StateFlow<Boolean> = _albumsGridView.asStateFlow()
+
+    fun toggleAlbumsGridView() { _albumsGridView.value = !_albumsGridView.value }
+
     private val _events = Channel<GalleryUiEvent>(Channel.BUFFERED)
     val events: Flow<GalleryUiEvent> = _events.receiveAsFlow()
 

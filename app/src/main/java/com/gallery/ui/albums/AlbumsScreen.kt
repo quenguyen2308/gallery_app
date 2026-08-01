@@ -47,7 +47,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,7 +82,7 @@ fun AlbumsScreen(
     var showCreateDialog by remember { mutableStateOf(false) }
     var albumToRename by remember { mutableStateOf<Album?>(null) }
     var showTopMenu by remember { mutableStateOf(false) }
-    var isGridView by rememberSaveable { mutableStateOf(true) }
+    val isGridView by viewModel.albumsGridView.collectAsStateWithLifecycle()
 
     val visibleAlbums = remember(albums, hiddenKeys) {
         albums.filter { it.id.storageKey() !in hiddenKeys }
@@ -97,7 +96,7 @@ fun AlbumsScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 actions = {
-                    IconButton(onClick = { isGridView = !isGridView }) {
+                    IconButton(onClick = { viewModel.toggleAlbumsGridView() }) {
                         Icon(
                             imageVector = if (isGridView) Icons.AutoMirrored.Rounded.ViewList else Icons.Rounded.GridView,
                             contentDescription = null,
