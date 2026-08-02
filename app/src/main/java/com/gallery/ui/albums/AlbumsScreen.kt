@@ -225,6 +225,7 @@ private fun AlbumsGrid(
                 coverUri = trashCoverUri,
                 icon = Icons.Rounded.Delete,
                 onClick = onOpenTrash,
+                iconTint = Color.Red,
             )
         }
         item {
@@ -280,6 +281,7 @@ private fun AlbumsList(
                 coverUri = trashCoverUri,
                 icon = Icons.Rounded.Delete,
                 onClick = onOpenTrash,
+                iconTint = Color.Red,
             )
             HorizontalDivider(modifier = Modifier.padding(start = 88.dp))
         }
@@ -316,6 +318,7 @@ private fun SystemAlbumGridCard(
     coverUri: android.net.Uri?,
     icon: ImageVector,
     onClick: () -> Unit,
+    iconTint: Color? = null,
 ) {
     Box(
         modifier = Modifier
@@ -336,7 +339,7 @@ private fun SystemAlbumGridCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                tint = iconTint ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 modifier = Modifier.size(44.dp).align(Alignment.Center),
             )
         }
@@ -420,6 +423,7 @@ private fun SystemAlbumListRow(
     coverUri: android.net.Uri?,
     icon: ImageVector,
     onClick: () -> Unit,
+    iconTint: Color? = null,
 ) {
     Row(
         modifier = Modifier
@@ -446,7 +450,7 @@ private fun SystemAlbumListRow(
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    tint = iconTint ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.size(28.dp),
                 )
             }

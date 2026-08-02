@@ -83,6 +83,11 @@ class GalleryViewModel @Inject constructor(
         _selectedIds.value = setOf(initialId)
     }
 
+    fun enterSelectionEmpty() {
+        _selectionMode.value = true
+        _selectedIds.value = emptySet()
+    }
+
     // Selection mode is only ever exited via clearSelection() (wired to the back gesture), never
     // implicitly when the selection count drops to zero — so the select-all circles stay on
     // screen and ready to reselect instead of the whole selection UI disappearing.

@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gallery.R
@@ -68,7 +69,7 @@ fun SelectionActionBar(
             contentDescription = stringResource(R.string.action_favorite),
             onClick = onToggleFavorite,
         )
-        PillActionItem(Icons.Rounded.Delete, stringResource(R.string.action_delete), onDelete)
+        PillActionItem(Icons.Rounded.Delete, stringResource(R.string.action_delete), onDelete, tint = Color.Red)
         PillActionItem(Icons.Rounded.MoreVert, stringResource(R.string.action_more), onMore)
     }
 }
@@ -81,7 +82,7 @@ fun TrashSelectionActionBar(
 ) {
     FloatingBottomBar(modifier = modifier) {
         PillActionItem(Icons.Rounded.Restore, stringResource(R.string.action_restore), onRestore)
-        PillActionItem(Icons.Rounded.DeleteForever, stringResource(R.string.action_delete_forever), onDeleteForever)
+        PillActionItem(Icons.Rounded.DeleteForever, stringResource(R.string.action_delete_forever), onDeleteForever, tint = androidx.compose.ui.graphics.Color.Red)
     }
 }
 

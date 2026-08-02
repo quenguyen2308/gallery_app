@@ -104,7 +104,7 @@ fun TrashScreen(
                     },
                     actions = {
                         if (trashItems.isNotEmpty()) {
-                            TextButton(onClick = { viewModel.enterSelection(trashItems.first().media.id) }) {
+                            TextButton(onClick = { viewModel.enterSelectionEmpty() }) {
                                 Text(stringResource(R.string.action_select))
                             }
                         }

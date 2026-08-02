@@ -130,6 +130,7 @@ fun ImageViewerScreen(
                     icon = Icons.Rounded.Delete,
                     contentDescription = stringResource(R.string.action_delete),
                     onClick = { showDeleteConfirm = true },
+                    tint = Color.Red,
                 )
             }
         }

@@ -45,14 +45,14 @@ private val ActiveColor = Color(0xFF3A3C40)
 private val InactiveColor = Color(0xFF8E8E94)
 
 // ── Kích thước icon ───────────────────────────────────────────────────────────
-private val NavIconSize = 22.dp
-private val ActionIconSize = 20.dp
+private val NavIconSize = 28.dp
+private val ActionIconSize = 25.dp
 
 /**
  * Khoảng trống bottom cần thêm vào nội dung có thể scroll để hàng cuối
  * không bị khuất sau pill bar.
  */
-val FloatingBottomBarClearance = 80.dp
+val FloatingBottomBarClearance = 100.dp
 
 /**
  * Pill nổi dùng chung cho nav bar lẫn action bar chọn media.
@@ -65,13 +65,13 @@ fun FloatingBottomBar(
 ) {
     val navBarBottom = LocalNavBarBottom.current
     Surface(
-        modifier = modifier.padding(bottom = navBarBottom + 36.dp),
+        modifier = modifier.padding(bottom = navBarBottom + 25.dp),
         shape = RoundedCornerShape(50),
         color = PillBg.copy(alpha = 0.96f),
         shadowElevation = 6.dp,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 3.dp),
+            modifier = Modifier.padding(horizontal = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.CenterVertically,
             content = content,
@@ -103,11 +103,11 @@ fun RowScope.PillNavItem(
 
     Box(
         modifier = Modifier
-            .padding(vertical = 5.dp, horizontal = 10.dp)
+            .padding(vertical = 4.dp, horizontal = 2.dp)
             .clip(RoundedCornerShape(50))
             .background(bgColor)
             .clickable(onClick = onClick)
-            .padding(vertical = 4.dp, horizontal = 10.dp),
+            .padding(vertical = 1.dp, horizontal = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -129,10 +129,10 @@ fun RowScope.PillActionItem(
 ) {
     Box(
         modifier = Modifier
-            .padding(vertical = 5.dp, horizontal = 5.dp)
+            .padding(vertical = 4.dp, horizontal = 2.dp)
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(vertical = 4.dp, horizontal = 10.dp),
+            .padding(vertical = 1.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
