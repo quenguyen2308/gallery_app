@@ -225,7 +225,7 @@ private fun AlbumsGrid(
                 coverUri = trashCoverUri,
                 icon = Icons.Rounded.Delete,
                 onClick = onOpenTrash,
-                iconTint = Color.Red,
+                iconTint = Color(0xFFA83636),
             )
         }
         item {
@@ -281,7 +281,7 @@ private fun AlbumsList(
                 coverUri = trashCoverUri,
                 icon = Icons.Rounded.Delete,
                 onClick = onOpenTrash,
-                iconTint = Color.Red,
+                iconTint = Color(0xFFA83636),
             )
             HorizontalDivider(modifier = Modifier.padding(start = 88.dp))
         }

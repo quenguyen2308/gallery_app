@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.gallery.R
 import com.gallery.ui.components.FloatingBottomBar
 import com.gallery.ui.components.PillActionItem
+import com.gallery.ui.theme.SelectionOverlay
 
 /**
  * No close button here on purpose: selection mode is only exited via the system back gesture
@@ -43,7 +44,7 @@ fun SelectionTopBar(
             Icon(
                 imageVector = if (isAllSelected) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = stringResource(R.string.action_select_all),
-                tint = if (isAllSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = if (isAllSelected) SelectionOverlay else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
                     .padding(start = 14.dp)
                     .clickable(onClick = onToggleSelectAll),
@@ -68,8 +69,9 @@ fun SelectionActionBar(
             icon = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
             contentDescription = stringResource(R.string.action_favorite),
             onClick = onToggleFavorite,
+            tint = if (isFavorite) Color(0xFFB83030) else Color(0xFF3A3C40),
         )
-        PillActionItem(Icons.Rounded.Delete, stringResource(R.string.action_delete), onDelete, tint = Color.Red)
+        PillActionItem(Icons.Rounded.Delete, stringResource(R.string.action_delete), onDelete, tint = Color(0xFFA83636))
         PillActionItem(Icons.Rounded.MoreVert, stringResource(R.string.action_more), onMore)
     }
 }
@@ -82,7 +84,7 @@ fun TrashSelectionActionBar(
 ) {
     FloatingBottomBar(modifier = modifier) {
         PillActionItem(Icons.Rounded.Restore, stringResource(R.string.action_restore), onRestore)
-        PillActionItem(Icons.Rounded.DeleteForever, stringResource(R.string.action_delete_forever), onDeleteForever, tint = androidx.compose.ui.graphics.Color.Red)
+        PillActionItem(Icons.Rounded.DeleteForever, stringResource(R.string.action_delete_forever), onDeleteForever, tint = Color(0xFFA83636)) //androidx.compose.ui.graphics.Color.Red
     }
 }
 

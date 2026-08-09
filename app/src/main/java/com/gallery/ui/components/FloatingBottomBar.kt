@@ -33,10 +33,10 @@ val LocalNavBarBottom = compositionLocalOf<Dp> { 0.dp }
 
 // ── Màu sắc pill bar ──────────────────────────────────────────────────────────
 /** Màu nền pill (thanh điều hướng nổi). */
-private val PillBg = Color(0xFFE8E5E0)
+private val PillBg = Color(0xFFF8F8F8) // 0xFFE8E5E0
 
 /** Màu nền oval của tab đang active. */
-private val ActiveTabBg = Color(0xFFCDC9C4)
+private val ActiveTabBg = Color(0xFFD9D9D9) //0xFFCDC9C4
 
 /** Màu icon / chữ khi tab được chọn. */
 private val ActiveColor = Color(0xFF3A3C40)
@@ -103,11 +103,11 @@ fun RowScope.PillNavItem(
 
     Box(
         modifier = Modifier
-            .padding(vertical = 4.dp, horizontal = 2.dp)
+            .padding(vertical = 3.3.dp, horizontal = 2.dp)
             .clip(RoundedCornerShape(50))
             .background(bgColor)
             .clickable(onClick = onClick)
-            .padding(vertical = 1.dp, horizontal = 20.dp),
+            .padding(vertical = 3.dp, horizontal = 15.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -129,10 +129,10 @@ fun RowScope.PillActionItem(
 ) {
     Box(
         modifier = Modifier
-            .padding(vertical = 4.dp, horizontal = 2.dp)
+            .padding(vertical = 3.3.dp, horizontal = 2.dp)
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(vertical = 1.dp, horizontal = 10.dp),
+            .padding(vertical = 3.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(

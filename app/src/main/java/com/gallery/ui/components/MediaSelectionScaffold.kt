@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +71,10 @@ fun MediaSelectionScaffold(
     val isAllFavorite = selectedItems.isNotEmpty() && selectedItems.all { it.isFavorite }
 
     BackHandler(enabled = selectionMode) { viewModel.clearSelection() }
+
+    LaunchedEffect(selectionMode, selectedItems.isEmpty()) {
+        if (selectionMode && selectedItems.isEmpty()) viewModel.clearSelection()
+    }
 
     var showAddSheet by remember { mutableStateOf(false) }
     var pendingAlbumAction by remember { mutableStateOf<PendingAlbumAction?>(null) }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ import com.gallery.domain.model.MediaItem
 import com.gallery.ui.GalleryViewModel
 import com.gallery.ui.components.FloatingBottomBarClearance
 import com.gallery.ui.components.MediaSelectionScaffold
+import com.gallery.ui.theme.SelectionOverlay
 import com.gallery.ui.theme.ThumbnailShape
 import com.gallery.util.MediaDateGroup
 import com.gallery.util.groupMediaByDate
@@ -133,7 +135,7 @@ fun DateGroupHeader(
                 modifier = Modifier
                     .size(24.dp)
                     .clickable(onClick = onToggleGroup),
-                tint = if (isFullySelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = if (isFullySelected) SelectionOverlay else MaterialTheme.colorScheme.onSurfaceVariant,
             )
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(start = 8.dp))
         }
@@ -209,6 +211,17 @@ fun PhotoThumbnail(
                 )
             }
         }
+        if (item.isFavorite && !selectionMode) {
+            Icon(
+                imageVector = Icons.Rounded.Favorite,
+                contentDescription = null,
+                tint = Color(0xFFE05C5C),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(5.dp)
+                    .size(16.dp),
+            )
+        }
         if (selectionMode) {
             SelectionDot(
                 isSelected = isSelected,
@@ -226,7 +239,7 @@ fun SelectionDot(isSelected: Boolean, modifier: Modifier = Modifier) {
         modifier = modifier
             .size(24.dp)
             .background(
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Black.copy(alpha = 0.35f),
+                color = if (isSelected) SelectionOverlay else Color.Black.copy(alpha = 0.35f),
                 shape = CircleShape,
             )
             .border(
@@ -240,7 +253,7 @@ fun SelectionDot(isSelected: Boolean, modifier: Modifier = Modifier) {
             Icon(
                 Icons.Rounded.Check,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = Color.White,
                 modifier = Modifier.size(15.dp),
             )
         }
