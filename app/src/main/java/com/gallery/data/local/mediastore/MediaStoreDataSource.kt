@@ -37,6 +37,8 @@ class MediaStoreDataSource @Inject constructor(
         MediaStore.Files.FileColumns.SIZE,
         MediaStore.Files.FileColumns.BUCKET_ID,
         MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME,
+        MediaStore.MediaColumns.RELATIVE_PATH,
+        MediaStore.MediaColumns.DATA,
     )
 
     /** Emits the full media library every time MediaStore changes. */
@@ -97,6 +99,8 @@ class MediaStoreDataSource @Inject constructor(
                 val sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE)
                 val bucketIdCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.BUCKET_ID)
                 val bucketNameCol = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.BUCKET_DISPLAY_NAME)
+                val relativePathCol = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.RELATIVE_PATH)
+                val dataCol = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)
 
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idCol)
@@ -121,6 +125,11 @@ class MediaStoreDataSource @Inject constructor(
                         sizeBytes = cursor.getLong(sizeCol),
                         bucketId = cursor.getString(bucketIdCol) ?: "",
                         bucketName = cursor.getString(bucketNameCol) ?: "",
+                        relativePath = run {
+                            val rel = cursor.getString(relativePathCol)?.trimEnd('/')
+                            if (!rel.isNullOrBlank()) rel
+                            else cursor.getString(dataCol)?.substringBeforeLast('/') ?: ""
+                        },
                     )
                 }
             }

@@ -28,7 +28,7 @@ fun MediaDetailsDialog(item: MediaItem, onDismiss: () -> Unit) {
                 DetailRow(stringResource(R.string.detail_dimensions), "${item.width} × ${item.height}")
                 DetailRow(stringResource(R.string.detail_file_size), formatFileSize(item.sizeBytes))
                 DetailRow(stringResource(R.string.detail_type), item.mimeType)
-                DetailRow(stringResource(R.string.detail_folder), item.bucketName)
+                DetailRow(stringResource(R.string.detail_folder), item.relativePath)
                 if (item.isVideo) {
                     DetailRow(stringResource(R.string.detail_duration), formatDuration(item.durationMs))
                 }

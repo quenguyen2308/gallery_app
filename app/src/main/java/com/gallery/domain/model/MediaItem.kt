@@ -16,5 +16,6 @@ data class MediaItem(
     val sizeBytes: Long,
     val bucketId: String,
     val bucketName: String,
+    val relativePath: String,
     val isFavorite: Boolean = false,
 )
