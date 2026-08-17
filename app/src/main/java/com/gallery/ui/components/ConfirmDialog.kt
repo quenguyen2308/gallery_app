@@ -60,7 +60,7 @@ fun ConfirmDialog(
             contentAlignment = Alignment.BottomCenter,
         ) {
             Surface(
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(25.dp),
                 color = DialogBg,
                 shadowElevation = 6.dp,
                 modifier = Modifier.fillMaxWidth(0.85f),
@@ -69,7 +69,7 @@ fun ConfirmDialog(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 15.dp, vertical = 10.dp),
                     ) {
                         if (title != null) {
                             Text(
@@ -77,7 +77,7 @@ fun ConfirmDialog(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
                             )
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.height(5.dp))
                         }
                         Text(
                             text = message,
@@ -96,7 +96,7 @@ fun ConfirmDialog(
                             modifier = Modifier
                                 .weight(1f)
                                 .clickable(onClick = onDismiss)
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 5.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
@@ -114,7 +114,7 @@ fun ConfirmDialog(
                             modifier = Modifier
                                 .weight(1f)
                                 .clickable(onClick = { onDismiss(); onConfirm() })
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 5.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(

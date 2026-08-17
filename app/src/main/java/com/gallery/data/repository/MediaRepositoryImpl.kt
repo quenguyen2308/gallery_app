@@ -153,7 +153,7 @@ class MediaRepositoryImpl @Inject constructor(
 
     override fun observeTrash(): Flow<List<TrashItem>> = combine(
         trashDao.observeAll(),
-        mediaStoreDataSource.observeAllMedia(),
+        mediaStoreDataSource.observeAllMediaIncludingTrashed(),
     ) { entries, allMedia ->
         val byId = allMedia.associateBy { it.id }
         entries.mapNotNull { entry ->
@@ -182,7 +182,17 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun moveToTrash(mediaIds: List<Long>) = withContext(Dispatchers.IO) {
+    override suspend fun moveToTrash(mediaIds: List<Long>): DeleteResult = withContext(Dispatchers.IO) {
+        val items = mediaStoreDataSource.getMediaItems(mediaIds)
+        val uris = items.map { it.uri }
+        val result = if (uris.isNotEmpty()) mediaFileOperations.trashMedia(uris, trash = true) else DeleteResult.Success
+        if (result is DeleteResult.Success) {
+            finalizeTrashMove(mediaIds)
+        }
+        result
+    }
+
+    override suspend fun finalizeTrashMove(mediaIds: List<Long>) = withContext(Dispatchers.IO) {
         val now = System.currentTimeMillis()
         val expiresAt = now + TimeUnit.DAYS.toMillis(TRASH_RETENTION_DAYS)
         val entries = mediaIds.map { id ->
@@ -192,7 +202,17 @@ class MediaRepositoryImpl @Inject constructor(
         trashDao.insertAll(entries)
     }
 
-    override suspend fun restoreFromTrash(mediaIds: List<Long>) = withContext(Dispatchers.IO) {
+    override suspend fun restoreFromTrash(mediaIds: List<Long>): DeleteResult = withContext(Dispatchers.IO) {
+        val items = mediaStoreDataSource.getMediaItems(mediaIds)
+        val uris = items.map { it.uri }
+        val result = if (uris.isNotEmpty()) mediaFileOperations.trashMedia(uris, trash = false) else DeleteResult.Success
+        if (result is DeleteResult.Success) {
+            finalizeRestoreFromTrash(mediaIds)
+        }
+        result
+    }
+
+    override suspend fun finalizeRestoreFromTrash(mediaIds: List<Long>) = withContext(Dispatchers.IO) {
         trashDao.deleteAll(mediaIds)
     }
 

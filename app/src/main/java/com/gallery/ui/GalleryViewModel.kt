@@ -29,6 +29,8 @@ import javax.inject.Inject
 sealed interface GalleryUiEvent {
     data class Message(val text: String) : GalleryUiEvent
     data class RequestDeleteConfirmation(val intentSender: IntentSender, val mediaIds: List<Long>) : GalleryUiEvent
+    data class RequestTrashConfirmation(val intentSender: IntentSender, val mediaIds: List<Long>) : GalleryUiEvent
+    data class RequestRestoreConfirmation(val intentSender: IntentSender, val mediaIds: List<Long>) : GalleryUiEvent
 }
 
 @HiltViewModel
@@ -118,13 +120,42 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun moveToTrash(ids: Collection<Long>) = viewModelScope.launch {
-        repository.moveToTrash(ids.toList())
+        when (val result = repository.moveToTrash(ids.toList())) {
+            is DeleteResult.Success -> {
+                clearSelection()
+                _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_trash)))
+            }
+            is DeleteResult.RequiresConfirmation -> {
+                _events.send(GalleryUiEvent.RequestTrashConfirmation(result.intentSender, ids.toList()))
+            }
+            is DeleteResult.Error -> {
+                _events.send(GalleryUiEvent.Message(result.message))
+            }
+        }
+    }
+
+    fun onTrashConfirmed(ids: Collection<Long>) = viewModelScope.launch {
+        repository.finalizeTrashMove(ids.toList())
         clearSelection()
         _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_trash)))
     }
 
     fun restoreFromTrash(ids: Collection<Long>) = viewModelScope.launch {
-        repository.restoreFromTrash(ids.toList())
+        when (val result = repository.restoreFromTrash(ids.toList())) {
+            is DeleteResult.Success -> {
+                clearSelection()
+            }
+            is DeleteResult.RequiresConfirmation -> {
+                _events.send(GalleryUiEvent.RequestRestoreConfirmation(result.intentSender, ids.toList()))
+            }
+            is DeleteResult.Error -> {
+                _events.send(GalleryUiEvent.Message(result.message))
+            }
+        }
+    }
+
+    fun onRestoreConfirmed(ids: Collection<Long>) = viewModelScope.launch {
+        repository.finalizeRestoreFromTrash(ids.toList())
         clearSelection()
     }
 

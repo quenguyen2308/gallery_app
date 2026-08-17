@@ -45,14 +45,14 @@ private val ActiveColor = Color(0xFF3A3C40)
 private val InactiveColor = Color(0xFF8E8E94)
 
 // ── Kích thước icon ───────────────────────────────────────────────────────────
-private val NavIconSize = 28.dp
-private val ActionIconSize = 25.dp
+private val NavIconSize = 35.dp
+private val ActionIconSize = 31.dp
 
 /**
  * Khoảng trống bottom cần thêm vào nội dung có thể scroll để hàng cuối
  * không bị khuất sau pill bar.
  */
-val FloatingBottomBarClearance = 100.dp
+val FloatingBottomBarClearance = 125.dp
 
 /**
  * Pill nổi dùng chung cho nav bar lẫn action bar chọn media.
@@ -71,7 +71,7 @@ fun FloatingBottomBar(
         shadowElevation = 6.dp,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 4.dp),
+            modifier = Modifier.padding(horizontal = 5.dp),
             horizontalArrangement = Arrangement.spacedBy(0.dp),
             verticalAlignment = Alignment.CenterVertically,
             content = content,
@@ -103,11 +103,11 @@ fun RowScope.PillNavItem(
 
     Box(
         modifier = Modifier
-            .padding(vertical = 3.3.dp, horizontal = 2.dp)
+            .padding(vertical = 4.dp, horizontal = 2.5.dp)
             .clip(RoundedCornerShape(50))
             .background(bgColor)
             .clickable(onClick = onClick)
-            .padding(vertical = 3.dp, horizontal = 15.dp),
+            .padding(vertical = 3.75.dp, horizontal = 19.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(
@@ -129,10 +129,10 @@ fun RowScope.PillActionItem(
 ) {
     Box(
         modifier = Modifier
-            .padding(vertical = 3.3.dp, horizontal = 2.dp)
+            .padding(vertical = 4.dp, horizontal = 2.5.dp)
             .clip(RoundedCornerShape(50))
             .clickable(onClick = onClick)
-            .padding(vertical = 3.dp, horizontal = 10.dp),
+            .padding(vertical = 3.75.dp, horizontal = 12.5.dp),
         contentAlignment = Alignment.Center,
     ) {
         Icon(

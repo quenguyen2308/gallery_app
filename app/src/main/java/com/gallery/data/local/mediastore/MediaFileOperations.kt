@@ -39,6 +39,19 @@ class MediaFileOperations @Inject constructor(
     }
 
     /**
+     * Sets IS_TRASHED on MediaStore entries (Android 11+). The OS always shows a confirmation
+     * dialog for files not owned by this app, so RequiresConfirmation is the normal path.
+     * Pass trash=false to restore (un-trash).
+     */
+    suspend fun trashMedia(uris: List<Uri>, trash: Boolean): DeleteResult = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val pendingIntent = MediaStore.createTrashRequest(context.contentResolver, uris, trash)
+            return@withContext DeleteResult.RequiresConfirmation(pendingIntent.intentSender)
+        }
+        DeleteResult.Success
+    }
+
+    /**
      * Deletes rows immediately when possible. On Android 10 the OS may require a one-time
      * user grant (RecoverableSecurityException); on Android 11+ deleting media the app does
      * not own always requires routing through the system confirmation dialog.

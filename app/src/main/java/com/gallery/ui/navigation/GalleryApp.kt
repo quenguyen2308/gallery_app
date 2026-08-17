@@ -60,6 +60,8 @@ fun GalleryApp() {
     val selectionMode by viewModel.selectionMode.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var pendingDeleteIds by remember { mutableStateOf<List<Long>>(emptyList()) }
+    var pendingTrashIds by remember { mutableStateOf<List<Long>>(emptyList()) }
+    var pendingRestoreIds by remember { mutableStateOf<List<Long>>(emptyList()) }
 
     val activity = LocalContext.current as? Activity
     val scope = rememberCoroutineScope()
@@ -91,6 +93,22 @@ fun GalleryApp() {
         }
     }
 
+    val trashLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onTrashConfirmed(pendingTrashIds)
+        }
+    }
+
+    val restoreLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.onRestoreConfirmed(pendingRestoreIds)
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -98,6 +116,14 @@ fun GalleryApp() {
                 is GalleryUiEvent.RequestDeleteConfirmation -> {
                     pendingDeleteIds = event.mediaIds
                     deleteLauncher.launch(IntentSenderRequest.Builder(event.intentSender).build())
+                }
+                is GalleryUiEvent.RequestTrashConfirmation -> {
+                    pendingTrashIds = event.mediaIds
+                    trashLauncher.launch(IntentSenderRequest.Builder(event.intentSender).build())
+                }
+                is GalleryUiEvent.RequestRestoreConfirmation -> {
+                    pendingRestoreIds = event.mediaIds
+                    restoreLauncher.launch(IntentSenderRequest.Builder(event.intentSender).build())
                 }
             }
         }

@@ -29,8 +29,12 @@ interface MediaRepository {
     suspend fun setFavorite(mediaIds: List<Long>, isFavorite: Boolean)
 
     // Trash
-    suspend fun moveToTrash(mediaIds: List<Long>)
-    suspend fun restoreFromTrash(mediaIds: List<Long>)
+    suspend fun moveToTrash(mediaIds: List<Long>): DeleteResult
+    /** Cleans up Room bookkeeping after a trash confirmation was accepted by the user (API 30+). */
+    suspend fun finalizeTrashMove(mediaIds: List<Long>)
+    suspend fun restoreFromTrash(mediaIds: List<Long>): DeleteResult
+    /** Cleans up Room bookkeeping after a restore-from-trash confirmation was accepted (API 30+). */
+    suspend fun finalizeRestoreFromTrash(mediaIds: List<Long>)
     suspend fun deleteForever(mediaIds: List<Long>): DeleteResult
 
     /** Cleans up Room bookkeeping after a [DeleteResult.RequiresConfirmation] intent was confirmed by the user. */
