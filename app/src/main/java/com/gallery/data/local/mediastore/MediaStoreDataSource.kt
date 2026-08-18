@@ -82,15 +82,17 @@ class MediaStoreDataSource @Inject constructor(
         // the parens this reads as "MEDIA_TYPE = image OR (MEDIA_TYPE = video AND _ID = ?)" —
         // matching every single image row in the library regardless of the requested id.
         val selection = "(${mediaTypeSelection()}) AND ${MediaStore.Files.FileColumns._ID} = ?"
-        queryMedia(selection, mediaTypeArgs() + mediaId.toString()).firstOrNull()
+        queryMediaIncludingTrashed(selection, mediaTypeArgs() + mediaId.toString()).firstOrNull()
     }
 
+    // Must include trashed items (IS_TRASHED = 1): callers include restore/delete-forever/purge
+    // on the trash screen, which resolve the URI for items that are, by definition, trashed.
     suspend fun getMediaItems(mediaIds: List<Long>): List<MediaItem> = withContext(Dispatchers.IO) {
         if (mediaIds.isEmpty()) return@withContext emptyList()
         val placeholders = mediaIds.joinToString(",") { "?" }
         // Same parenthesization fix as getMediaItem — see comment there.
         val selection = "(${mediaTypeSelection()}) AND ${MediaStore.Files.FileColumns._ID} IN ($placeholders)"
-        queryMedia(selection, mediaTypeArgs() + mediaIds.map { it.toString() })
+        queryMediaIncludingTrashed(selection, mediaTypeArgs() + mediaIds.map { it.toString() })
     }
 
     suspend fun findOriginalPath(mediaId: Long): String? = withContext(Dispatchers.IO) {
@@ -104,6 +106,22 @@ class MediaStoreDataSource @Inject constructor(
         MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
         MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString(),
     )
+
+    private suspend fun queryMediaIncludingTrashed(
+        selection: String,
+        selectionArgs: Array<String>,
+    ): List<MediaItem> = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val queryArgs = Bundle().apply {
+                putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_INCLUDE)
+                putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
+                putStringArray(ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS, selectionArgs)
+            }
+            queryMediaWithBundle(queryArgs)
+        } else {
+            queryMedia(selection, selectionArgs)
+        }
+    }
 
     private suspend fun queryMediaWithBundle(queryArgs: Bundle): List<MediaItem> =
         withContext(Dispatchers.IO) {
