@@ -196,26 +196,31 @@ fun TrashScreen(
     }
 
     if (showDeleteForeverConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.confirm_delete_forever_title),
-            message = stringResource(R.string.confirm_delete_forever_message, safeIds.size),
-            confirmLabel = stringResource(R.string.action_delete_forever),
-            onDismiss = { showDeleteForeverConfirm = false },
-            onConfirm = { viewModel.deleteForever(safeIds) },
-        )
+        //ConfirmDialog(
+        //    title = stringResource(R.string.confirm_delete_forever_title),
+        //    message = stringResource(R.string.confirm_delete_forever_message, safeIds.size),
+        //    confirmLabel = stringResource(R.string.action_delete_forever),
+        //    onDismiss = { showDeleteForeverConfirm = false },
+        //    onConfirm = { viewModel.deleteForever(safeIds) },
+        //)
+        viewModel.deleteForever(safeIds)
+        showDeleteForeverConfirm = false
     }
 
     if (showEmptyTrashConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.confirm_empty_trash_title),
-            message = stringResource(R.string.confirm_empty_trash_message, trashItems.size),
-            confirmLabel = stringResource(R.string.action_delete_forever),
-            onDismiss = { showEmptyTrashConfirm = false },
-            onConfirm = {
-                val allIds = trashItems.map { it.media.id }.toSet()
-                viewModel.deleteForever(allIds)
-            },
-        )
+        //ConfirmDialog(
+        //    title = stringResource(R.string.confirm_empty_trash_title),
+        //    message = stringResource(R.string.confirm_empty_trash_message, trashItems.size),
+        //    confirmLabel = stringResource(R.string.action_delete_forever),
+        //    onDismiss = { showEmptyTrashConfirm = false },
+        //    onConfirm = {
+        //        val allIds = trashItems.map { it.media.id }.toSet()
+        //        viewModel.deleteForever(allIds)
+        //    },
+        //)
+        val allIds = trashItems.map { it.media.id }.toSet()
+        viewModel.deleteForever(allIds)
+        showEmptyTrashConfirm = false
     }
 }
 

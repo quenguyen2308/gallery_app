@@ -227,12 +227,14 @@ fun MediaSelectionScaffold(
     }
 
     if (showDeleteConfirm) {
-        ConfirmDialog(
-            title = stringResource(R.string.confirm_move_to_trash_title),
-            message = stringResource(R.string.confirm_move_to_trash_message, safeIds.size),
-            confirmLabel = stringResource(R.string.action_delete),
-            onDismiss = { showDeleteConfirm = false },
-            onConfirm = { viewModel.moveToTrash(safeIds) },
-        )
+        //ConfirmDialog(
+        //    title = stringResource(R.string.confirm_move_to_trash_title),
+        //    message = stringResource(R.string.confirm_move_to_trash_message, safeIds.size),
+        //    confirmLabel = stringResource(R.string.action_delete),
+        //    onDismiss = { showDeleteConfirm = false },
+        //    onConfirm = { viewModel.moveToTrash(safeIds) },
+        //)
+        viewModel.moveToTrash(safeIds)
+        showDeleteConfirm = false
     }
 }
