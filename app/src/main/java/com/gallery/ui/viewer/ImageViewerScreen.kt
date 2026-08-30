@@ -37,7 +37,6 @@ import com.gallery.ui.components.AddBottomSheet
 import com.gallery.ui.components.AddSheetActions
 import com.gallery.ui.components.AlbumPickerDialog
 import com.gallery.ui.components.AlbumPickerMode
-import com.gallery.ui.components.ConfirmDialog
 import com.gallery.ui.components.FloatingBottomBar
 import com.gallery.ui.components.MediaDetailsDialog
 import com.gallery.ui.components.PillActionItem
@@ -64,7 +63,6 @@ fun ImageViewerScreen(
     var showRename by remember { mutableStateOf(false) }
     var showAlbumPicker by remember { mutableStateOf(false) }
     var showCreateAlbum by remember { mutableStateOf(false) }
-    var showDeleteConfirm by remember { mutableStateOf(false) }
     // `items` is a static snapshot passed in once (GalleryViewModel.setViewerContext), so it never
     // reflects later favorite toggles on its own — track overrides locally for instant feedback.
     var favoriteOverrides by remember { mutableStateOf(emptyMap<Long, Boolean>()) }
@@ -129,7 +127,7 @@ fun ImageViewerScreen(
                 PillActionItem(
                     icon = Icons.Rounded.Delete,
                     contentDescription = stringResource(R.string.action_delete),
-                    onClick = { showDeleteConfirm = true },
+                    onClick = { viewModel.moveToTrash(listOf(item.id)) { onBack() } },
                     tint = Color(0xFFA83636),
                 )
             }
@@ -191,15 +189,6 @@ fun ImageViewerScreen(
                 viewModel.createAlbumFromSelection(name, listOf(currentItem.id))
                 showCreateAlbum = false
             },
-        )
-    }
-
-    if (showDeleteConfirm && currentItem != null) {
-        ConfirmDialog(
-            message = stringResource(R.string.confirm_move_to_trash_message, 1),
-            confirmLabel = stringResource(R.string.action_delete),
-            onDismiss = { showDeleteConfirm = false },
-            onConfirm = { viewModel.moveToTrash(listOf(currentItem.id)); onBack() },
         )
     }
 }

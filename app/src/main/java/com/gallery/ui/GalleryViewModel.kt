@@ -119,17 +119,27 @@ class GalleryViewModel @Inject constructor(
         repository.setFavorite(ids.toList(), isFavorite)
     }
 
-    fun moveToTrash(ids: Collection<Long>) = viewModelScope.launch {
+    // Set right before a moveToTrash call whose caller needs to know when the trash actually
+    // completes (e.g. ImageViewerScreen popping back). Confirmation is async and handled by a
+    // single collector in GalleryApp, so a per-call lambda can't be captured there directly —
+    // this field is how the result gets routed back to the original caller instead.
+    private var trashCompletionCallback: (() -> Unit)? = null
+
+    fun moveToTrash(ids: Collection<Long>, onComplete: (() -> Unit)? = null) = viewModelScope.launch {
+        trashCompletionCallback = onComplete
         when (val result = repository.moveToTrash(ids.toList())) {
             is DeleteResult.Success -> {
                 clearSelection()
                 _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_trash)))
+                trashCompletionCallback?.invoke()
+                trashCompletionCallback = null
             }
             is DeleteResult.RequiresConfirmation -> {
                 _events.send(GalleryUiEvent.RequestTrashConfirmation(result.intentSender, ids.toList()))
             }
             is DeleteResult.Error -> {
                 _events.send(GalleryUiEvent.Message(result.message))
+                trashCompletionCallback = null
             }
         }
     }
@@ -138,6 +148,8 @@ class GalleryViewModel @Inject constructor(
         repository.finalizeTrashMove(ids.toList())
         clearSelection()
         _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_trash)))
+        trashCompletionCallback?.invoke()
+        trashCompletionCallback = null
     }
 
     fun restoreFromTrash(ids: Collection<Long>) = viewModelScope.launch {
