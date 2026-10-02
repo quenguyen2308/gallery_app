@@ -1,13 +1,16 @@
 package com.gallery.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Collections
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Image
-import androidx.compose.material.icons.rounded.PhotoAlbum
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gallery.R
@@ -18,11 +21,20 @@ fun GalleryBottomNav(navController: NavController, modifier: Modifier = Modifier
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    FloatingBottomBar(modifier = modifier) {
+    FloatingBottomBar(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth(),
+    ) {
+        val isPhotos = currentRoute == GalleryDestinations.PHOTOS
+        val isAlbums = currentRoute == GalleryDestinations.ALBUMS
+        val isFavorites = currentRoute == GalleryDestinations.FAVORITES
+
         PillNavItem(
-            selected = currentRoute == GalleryDestinations.PHOTOS,
+            selected = isPhotos,
             icon = Icons.Rounded.Image,
-            label = stringResource(R.string.nav_photos),
+            label = "Gallery",
+            modifier = Modifier.weight(1f),
             onClick = {
                 navController.navigate(GalleryDestinations.PHOTOS) {
                     popUpTo(GalleryDestinations.PHOTOS) { inclusive = true }
@@ -31,9 +43,10 @@ fun GalleryBottomNav(navController: NavController, modifier: Modifier = Modifier
             },
         )
         PillNavItem(
-            selected = currentRoute == GalleryDestinations.ALBUMS,
-            icon = Icons.Rounded.PhotoAlbum,
+            selected = isAlbums,
+            icon = Icons.Rounded.Collections,
             label = stringResource(R.string.nav_albums),
+            modifier = Modifier.weight(1f),
             onClick = {
                 navController.navigate(GalleryDestinations.ALBUMS) {
                     popUpTo(GalleryDestinations.PHOTOS)
@@ -42,9 +55,10 @@ fun GalleryBottomNav(navController: NavController, modifier: Modifier = Modifier
             },
         )
         PillNavItem(
-            selected = currentRoute == GalleryDestinations.FAVORITES,
+            selected = isFavorites,
             icon = Icons.Rounded.Favorite,
             label = stringResource(R.string.favorites_title),
+            modifier = Modifier.weight(1f),
             onClick = {
                 navController.navigate(GalleryDestinations.FAVORITES) {
                     popUpTo(GalleryDestinations.PHOTOS)

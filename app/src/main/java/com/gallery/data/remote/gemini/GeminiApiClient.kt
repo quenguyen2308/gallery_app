@@ -81,12 +81,13 @@ class GeminiApiClient @Inject constructor() {
         val parts = JSONArray().apply {
             put(JSONObject().put("text", prompt))
             images.forEach { bitmap ->
+                val scaled = downscaleForApi(bitmap)
                 put(
                     JSONObject().put(
                         "inline_data",
                         JSONObject()
                             .put("mime_type", "image/jpeg")
-                            .put("data", bitmap.toBase64Jpeg()),
+                            .put("data", scaled.toBase64Jpeg()),
                     ),
                 )
             }
@@ -95,6 +96,19 @@ class GeminiApiClient @Inject constructor() {
             put("contents", JSONArray().put(JSONObject().put("parts", parts)))
             put("generationConfig", JSONObject().put("responseModalities", JSONArray(listOf("TEXT", "IMAGE"))))
         }
+    }
+
+    private fun downscaleForApi(bitmap: Bitmap, maxDimension: Int = 1536): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        if (width <= maxDimension && height <= maxDimension) return bitmap
+        val ratio = width.toFloat() / height.toFloat()
+        val (targetW, targetH) = if (ratio > 1f) {
+            maxDimension to (maxDimension / ratio).toInt()
+        } else {
+            (maxDimension * ratio).toInt() to maxDimension
+        }
+        return Bitmap.createScaledBitmap(bitmap, targetW.coerceAtLeast(1), targetH.coerceAtLeast(1), true)
     }
 
     private fun extractErrorMessage(responseText: String): String? = try {

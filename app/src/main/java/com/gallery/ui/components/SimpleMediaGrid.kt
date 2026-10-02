@@ -1,5 +1,6 @@
 package com.gallery.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.gallery.domain.model.MediaItem
 import com.gallery.ui.photos.PhotoThumbnail
 
@@ -21,6 +23,7 @@ fun SimpleMediaGrid(
     emptyText: String,
     onItemClick: (MediaItem) -> Unit,
     onItemLongClick: (MediaItem) -> Unit,
+    onToggleFavorite: ((MediaItem) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     if (items.isEmpty()) {
@@ -30,17 +33,22 @@ fun SimpleMediaGrid(
         return
     }
     LazyVerticalGrid(
-        columns = GridCells.Fixed(4),
+        columns = GridCells.Fixed(3),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = FloatingBottomBarClearance),
+        contentPadding = PaddingValues(start = 14.dp, top = 8.dp, end = 14.dp, bottom = FloatingBottomBarClearance),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items(items, key = { it.id }) { item ->
             PhotoThumbnail(
                 item = item,
                 isSelected = item.id in selectedIds,
                 selectionMode = selectionMode,
+                aspectRatio = 1f,
+                cornerRadius = 18.dp,
                 onClick = { onItemClick(item) },
                 onLongClick = { onItemLongClick(item) },
+                onToggleFavorite = { onToggleFavorite?.invoke(item) },
             )
         }
     }

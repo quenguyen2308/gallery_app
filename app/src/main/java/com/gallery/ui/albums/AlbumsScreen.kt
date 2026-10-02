@@ -2,11 +2,13 @@ package com.gallery.ui.albums
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +37,7 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import com.gallery.ui.theme.ThumbnailShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -203,18 +206,24 @@ private fun AlbumsGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier.fillMaxSize().padding(padding),
         contentPadding = PaddingValues(
-            start = 12.dp,
-            end = 12.dp,
+            start = 14.dp,
+            end = 14.dp,
+            top = 6.dp,
             bottom = FloatingBottomBarClearance,
         ),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             Text(
                 text = stringResource(R.string.all_albums),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
+                style = androidx.compose.ui.text.TextStyle(
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp,
+                    color = Color(0xFF2E2428),
+                    letterSpacing = (-0.5).sp,
+                ),
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
             )
         }
@@ -225,7 +234,7 @@ private fun AlbumsGrid(
                 coverUri = trashCoverUri,
                 icon = Icons.Rounded.Delete,
                 onClick = onOpenTrash,
-                iconTint = Color(0xFFA83636),
+                iconTint = Color(0xFFE05270),
             )
         }
         item {
@@ -235,6 +244,7 @@ private fun AlbumsGrid(
                 coverUri = null,
                 icon = Icons.Rounded.Lock,
                 onClick = onOpenSecureFolder,
+                iconTint = Color(0xFFC76085),
             )
         }
         items(visibleAlbums, key = { it.id.toString() }) { album ->
@@ -320,12 +330,18 @@ private fun SystemAlbumGridCard(
     onClick: () -> Unit,
     iconTint: Color? = null,
 ) {
+    val cardShape = RoundedCornerShape(22.dp)
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clip(cardShape)
+            .border(androidx.compose.foundation.BorderStroke(1.dp, com.gallery.ui.theme.SoftRoseCardBorder), cardShape)
+            .background(
+                Brush.linearGradient(
+                    listOf(Color(0xFFFFEEF3), Color(0xFFFFD9E2))
+                )
+            )
             .clickable(onClick = onClick),
     ) {
         if (coverUri != null) {
@@ -339,7 +355,7 @@ private fun SystemAlbumGridCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = iconTint ?: MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                tint = iconTint ?: Color(0xFFE86B85),
                 modifier = Modifier.size(44.dp).align(Alignment.Center),
             )
         }
@@ -347,14 +363,14 @@ private fun SystemAlbumGridCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.verticalGradient(0.45f to Color.Transparent, 1.0f to Color.Black.copy(alpha = 0.65f))
+                    Brush.verticalGradient(0.45f to Color.Transparent, 1.0f to Color(0x992E1C24))
                 ),
         )
         Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+            modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
         ) {
             Text(name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
-            Text("$itemCount", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.85f))
+            Text("$itemCount", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.88f))
         }
     }
 }
@@ -368,12 +384,18 @@ private fun AlbumGridCard(
     onDelete: () -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
+    val cardShape = RoundedCornerShape(22.dp)
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clip(cardShape)
+            .border(androidx.compose.foundation.BorderStroke(1.dp, com.gallery.ui.theme.SoftRoseCardBorder), cardShape)
+            .background(
+                Brush.linearGradient(
+                    listOf(Color(0xFFFFEEF3), Color(0xFFFFD9E2))
+                )
+            )
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = { if (album.id is AlbumId.Custom) showMenu = true },
@@ -390,7 +412,7 @@ private fun AlbumGridCard(
             Icon(
                 imageVector = Icons.Rounded.PhotoAlbum,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                tint = Color(0xFFE86B85),
                 modifier = Modifier.size(44.dp).align(Alignment.Center),
             )
         }
@@ -398,14 +420,14 @@ private fun AlbumGridCard(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.verticalGradient(0.45f to Color.Transparent, 1.0f to Color.Black.copy(alpha = 0.65f))
+                    Brush.verticalGradient(0.45f to Color.Transparent, 1.0f to Color(0x992E1C24))
                 ),
         )
         Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(8.dp),
+            modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
         ) {
             Text(album.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color.White)
-            Text("${album.itemCount}", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.85f))
+            Text("${album.itemCount}", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.88f))
         }
         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
             DropdownMenuItem(text = { Text(stringResource(R.string.action_rename)) }, onClick = { showMenu = false; onRename() })

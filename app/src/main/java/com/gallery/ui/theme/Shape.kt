@@ -7,9 +7,11 @@ import androidx.compose.ui.unit.dp
 val GalleryShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),
+    medium = RoundedCornerShape(18.dp),
     large = RoundedCornerShape(24.dp),
     extraLarge = RoundedCornerShape(32.dp),
 )
 
-val ThumbnailShape = RoundedCornerShape(14.dp)
+val ThumbnailShape = RoundedCornerShape(20.dp)
+val FilterChipShape = RoundedCornerShape(18.dp)
+val DialogShape = RoundedCornerShape(28.dp)

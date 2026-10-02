@@ -13,9 +13,11 @@ import android.provider.MediaStore
 import com.gallery.domain.model.MediaItem
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -44,6 +46,7 @@ class MediaStoreDataSource @Inject constructor(
         MediaStore.MediaColumns.DATA,
     )
 
+    @OptIn(FlowPreview::class)
     private fun mediaStoreChangeFlow(): Flow<Unit> = callbackFlow {
         val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
             override fun onChange(selfChange: Boolean) { trySend(Unit) }
@@ -51,7 +54,7 @@ class MediaStoreDataSource @Inject constructor(
         context.contentResolver.registerContentObserver(externalUri, true, observer)
         trySend(Unit)
         awaitClose { context.contentResolver.unregisterContentObserver(observer) }
-    }
+    }.debounce(300L)
 
     /** Emits the full media library every time MediaStore changes. */
     fun observeAllMedia(): Flow<List<MediaItem>> = mediaStoreChangeFlow()

@@ -41,7 +41,7 @@ sealed interface EditorEvent {
     data class Saved(val overwritten: Boolean) : EditorEvent
 }
 
-private const val MAX_HISTORY = 12
+private const val MAX_HISTORY = 6
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(

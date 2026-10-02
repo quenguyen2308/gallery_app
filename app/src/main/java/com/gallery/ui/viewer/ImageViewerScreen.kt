@@ -117,7 +117,7 @@ fun ImageViewerScreen(
                         favoriteOverrides = favoriteOverrides + (item.id to newValue)
                         viewModel.setFavorite(listOf(item.id), newValue)
                     },
-                    tint = if (item.isFavorite) Color(0xFFD4537E) else Color(0xFF3A3C40),
+                    tint = if (item.isFavorite) com.gallery.ui.theme.LocalExtendedColors.current.heartColor else com.gallery.ui.theme.LocalExtendedColors.current.activeContentColor,
                 )
                 PillActionItem(
                     icon = Icons.Rounded.Edit,

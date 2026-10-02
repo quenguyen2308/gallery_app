@@ -37,6 +37,7 @@ fun FavoritesScreen(
                 if (selectionMode) viewModel.toggleSelected(item.id) else onOpenViewer(item.id, items)
             },
             onItemLongClick = { item -> if (!selectionMode) viewModel.enterSelection(item.id) },
+            onToggleFavorite = { item -> viewModel.toggleFavorite(item.id) },
             modifier = Modifier.padding(padding),
         )
     }

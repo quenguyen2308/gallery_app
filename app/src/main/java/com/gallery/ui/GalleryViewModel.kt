@@ -119,6 +119,13 @@ class GalleryViewModel @Inject constructor(
         repository.setFavorite(ids.toList(), isFavorite)
     }
 
+    fun toggleFavorite(id: Long) = viewModelScope.launch {
+        val current = mediaItems.value.firstOrNull { it.id == id }?.isFavorite
+            ?: favorites.value.firstOrNull { it.id == id }?.isFavorite
+            ?: false
+        repository.setFavorite(listOf(id), !current)
+    }
+
     // Set right before a moveToTrash call whose caller needs to know when the trash actually
     // completes (e.g. ImageViewerScreen popping back). Confirmation is async and handled by a
     // single collector in GalleryApp, so a per-call lambda can't be captured there directly —
@@ -149,6 +156,10 @@ class GalleryViewModel @Inject constructor(
         clearSelection()
         _events.send(GalleryUiEvent.Message(context.getString(R.string.msg_moved_to_trash)))
         trashCompletionCallback?.invoke()
+        trashCompletionCallback = null
+    }
+
+    fun onTrashCancelled() {
         trashCompletionCallback = null
     }
 

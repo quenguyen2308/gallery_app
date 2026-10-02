@@ -139,6 +139,9 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    implementation("dev.chrisbanes.haze:haze:1.1.1")
+    implementation("dev.chrisbanes.haze:haze-materials:1.1.1")
+
     implementation(libs.coil.compose)
     implementation(libs.coil.video)
     implementation(libs.coil.network.okhttp)

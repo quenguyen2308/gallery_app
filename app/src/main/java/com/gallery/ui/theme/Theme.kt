@@ -11,6 +11,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -23,10 +24,7 @@ import com.google.android.material.color.utilities.SchemeTonalSpot
 import com.google.android.material.color.utilities.TonalPalette
 
 /**
- * Device dynamic color (Android 12+) is opt-in, not the default: it ties the whole app's palette
- * to whatever the current wallpaper happens to produce, which on a plain/neutral wallpaper reads
- * as flat and washed out. Defaulting to our own seed (via the same HCT algorithm Material You
- * uses) keeps the app looking intentional regardless of device wallpaper.
+ * GalleryAppTheme applies Style 1: Pastel Blossom (Soft Rose & Blush Pink).
  */
 @Composable
 fun GalleryAppTheme(
@@ -35,11 +33,40 @@ fun GalleryAppTheme(
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
+    val seedColor = SoftRoseSeed
+    val baseBackground = SoftRoseBackground
+    val baseSurface = SoftRoseSurface
+
+    val extendedColors = remember {
+        ExtendedGalleryColors(
+            pillBackground = SoftRosePillBg,
+            activeTabBackground = SoftRoseActiveTabBg,
+            activeContentColor = SoftRoseActiveColor,
+            inactiveContentColor = SoftRoseInactiveColor,
+            heartColor = SoftRoseHeart,
+            selectionColor = SoftRoseSelection,
+            chipBackground = SoftRoseChipBg,
+            chipActiveBackground = SoftRosePrimary,
+            chipActiveContent = Color.White,
+            chipBorder = SoftRoseChipBorder,
+        )
+    }
+
     val colorScheme = when {
         useDeviceDynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        else -> remember(darkTheme) { colorSchemeFromSeed(BrandSeed.toArgb(), darkTheme) }
+        else -> remember(darkTheme) {
+            val scheme = colorSchemeFromSeed(seedColor.toArgb(), darkTheme)
+            if (!darkTheme) {
+                scheme.copy(
+                    primary = SoftRosePrimary,
+                    background = baseBackground,
+                    surface = baseSurface,
+                    surfaceVariant = SoftRoseSurfaceVariant,
+                )
+            } else scheme
+        }
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -49,12 +76,14 @@ fun GalleryAppTheme(
         }
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = GalleryTypography,
-        shapes = GalleryShapes,
-        content = content,
-    )
+    CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = GalleryTypography,
+            shapes = GalleryShapes,
+            content = content,
+        )
+    }
 }
 
 @SuppressLint("RestrictedApi")
@@ -134,9 +163,9 @@ private fun buildColorScheme(
         onTertiary = Color(t.tone(100)),
         tertiaryContainer = Color(t.tone(90)),
         onTertiaryContainer = Color(t.tone(10)),
-        background = Color(0xFFF5F3F0),
+        background = Color(0xFFFFF9FA),
         onBackground = Color(n.tone(10)),
-        surface = Color(0xFFF5F3F0),
+        surface = Color(0xFFFFFFFF),
         onSurface = Color(n.tone(10)),
         surfaceVariant = Color(nv.tone(90)),
         onSurfaceVariant = Color(nv.tone(30)),

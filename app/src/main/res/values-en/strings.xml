@@ -154,4 +154,10 @@
     <string name="processing_replacing_bg">Replacing background…</string>
     <string name="processing_enhancing">Enhancing quality…</string>
     <string name="processing_applying_style">Applying %1$s style…</string>
+
+    <!-- Filter Chips -->
+    <string name="filter_all">All</string>
+    <string name="filter_photos">Photos</string>
+    <string name="filter_videos">Videos</string>
+    <string name="filter_favorites">Favorites</string>
 </resources>

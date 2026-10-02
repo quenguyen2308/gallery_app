@@ -41,6 +41,8 @@ import com.gallery.ui.util.assignAsContactPhoto
 import com.gallery.ui.util.setAsWallpaper
 import com.gallery.ui.util.shareMedia
 
+import androidx.compose.foundation.layout.RowScope
+
 private enum class PendingAlbumAction { MOVE, COPY, ADD }
 
 /**
@@ -55,6 +57,8 @@ fun MediaSelectionScaffold(
     title: String? = null,
     onBack: (() -> Unit)? = null,
     currentAlbumId: Long? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+    customTopBar: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val context = LocalContext.current
@@ -107,6 +111,7 @@ fun MediaSelectionScaffold(
                     isAllSelected = items.isNotEmpty() && selectedIds.containsAll(items.map { it.id }),
                     onToggleSelectAll = { viewModel.toggleGroupSelection(items.map { it.id }) },
                 )
+                customTopBar != null -> customTopBar()
                 title != null -> TopAppBar(
                     title = { Text(title, style = MaterialTheme.typography.titleLarge) },
                     navigationIcon = {
@@ -114,6 +119,7 @@ fun MediaSelectionScaffold(
                             IconButton(onClick = it) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null) }
                         }
                     },
+                    actions = actions,
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         scrolledContainerColor = MaterialTheme.colorScheme.background,

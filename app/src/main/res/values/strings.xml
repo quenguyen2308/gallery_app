@@ -160,4 +160,10 @@
     <string name="processing_replacing_bg">Đang thay nền…</string>
     <string name="processing_enhancing">Đang nâng cấp chất lượng…</string>
     <string name="processing_applying_style">Đang áp dụng phong cách %1$s…</string>
+
+    <!-- Filter Chips -->
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_photos">Hình ảnh</string>
+    <string name="filter_videos">Video</string>
+    <string name="filter_favorites">Yêu thích</string>
 </resources>

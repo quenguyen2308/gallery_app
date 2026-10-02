@@ -8,16 +8,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.gallery.ui.components.LocalNavBarBottom
+import com.gallery.ui.components.LocalHazeState
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.haze
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -98,6 +106,8 @@ fun GalleryApp() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             viewModel.onTrashConfirmed(pendingTrashIds)
+        } else {
+            viewModel.onTrashCancelled()
         }
     }
 
@@ -136,7 +146,11 @@ fun GalleryApp() {
     // GalleryBottomNav is an overlay (not the Scaffold `bottomBar` slot) so the grid beneath it
     // isn't clipped short — content scrolls fully behind the floating pill instead of stopping
     // at a solid-background gap the size of the reserved bottomBar area.
-    CompositionLocalProvider(LocalNavBarBottom provides navBarBottom) {
+    val hazeState = remember { HazeState() }
+    CompositionLocalProvider(
+        LocalNavBarBottom provides navBarBottom,
+        LocalHazeState provides hazeState,
+    ) {
         Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
@@ -144,7 +158,10 @@ fun GalleryApp() {
             NavHost(
                 navController = navController,
                 startDestination = GalleryDestinations.PHOTOS,
-                modifier = Modifier.padding(top = padding.calculateTopPadding()),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = padding.calculateTopPadding())
+                    .haze(hazeState),
             ) {
                 composable(GalleryDestinations.PHOTOS) {
                     PhotosScreen(
@@ -152,6 +169,12 @@ fun GalleryApp() {
                         onOpenViewer = { id, list ->
                             viewModel.setViewerContext(list)
                             navController.navigate(GalleryDestinations.viewerRoute(id))
+                        },
+                        onOpenFavorites = {
+                            navController.navigate(GalleryDestinations.FAVORITES) {
+                                popUpTo(GalleryDestinations.PHOTOS)
+                                launchSingleTop = true
+                            }
                         },
                     )
                 }
