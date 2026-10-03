@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Back card outline -->
+    <path
+        android:fillColor="#000000"
+        android:fillAlpha="0.45"
+        android:pathData="M 30,22 L 74,22 A 12,12 0 0 1 86,34 L 86,76 A 12,12 0 0 1 74,88 L 30,88 A 12,12 0 0 1 18,76 L 18,34 A 12,12 0 0 1 30,22 Z" />
+    <!-- Front card -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 38,30 L 82,30 A 12,12 0 0 1 94,42 L 94,84 A 12,12 0 0 1 82,96 L 38,96 A 12,12 0 0 1 26,84 L 26,42 A 12,12 0 0 1 38,30 Z" />
+    <!-- Center flower/sun cutout -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 60,63 A 8,8 0 1 1 60,47 A 8,8 0 1 1 60,63 Z" />
+</vector>
