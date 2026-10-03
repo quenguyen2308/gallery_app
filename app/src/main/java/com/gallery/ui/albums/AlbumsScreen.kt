@@ -38,6 +38,7 @@ import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import com.gallery.ui.theme.ThumbnailShape
+import dev.chrisbanes.haze.haze
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -202,9 +203,12 @@ private fun AlbumsGrid(
     onRename: (Album) -> Unit,
     onDelete: (Album) -> Unit,
 ) {
+    val hazeState = com.gallery.ui.components.LocalHazeState.current
+    val hazeModifier = if (hazeState != null) Modifier.haze(hazeState) else Modifier
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().padding(padding).then(hazeModifier),
         contentPadding = PaddingValues(
             start = 14.dp,
             end = 14.dp,
@@ -272,8 +276,11 @@ private fun AlbumsList(
     onRename: (Album) -> Unit,
     onDelete: (Album) -> Unit,
 ) {
+    val hazeState = com.gallery.ui.components.LocalHazeState.current
+    val hazeModifier = if (hazeState != null) Modifier.haze(hazeState) else Modifier
+
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().padding(padding).then(hazeModifier),
         contentPadding = PaddingValues(bottom = FloatingBottomBarClearance),
     ) {
         item {

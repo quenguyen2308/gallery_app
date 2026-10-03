@@ -73,6 +73,7 @@ import com.gallery.ui.theme.SelectionOverlay
 import com.gallery.ui.theme.ThumbnailShape
 import com.gallery.util.MediaDateGroup
 import com.gallery.util.groupMediaByDate
+import dev.chrisbanes.haze.haze
 import java.util.concurrent.TimeUnit
 
 enum class PhotoFilterCategory(val labelRes: Int) {
@@ -104,6 +105,10 @@ fun PhotosScreen(
             PhotoFilterCategory.FAVORITES -> mediaItems.filter { it.isFavorite }
         }
     }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val groups = remember(filteredItems) { groupMediaByDate(filteredItems, context) }
+    val hazeState = com.gallery.ui.components.LocalHazeState.current
 
     MediaSelectionScaffold(
         viewModel = viewModel,
@@ -220,88 +225,88 @@ fun PhotosScreen(
                 )
             }
         } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentPadding = PaddingValues(start = 14.dp, top = 6.dp, end = 14.dp, bottom = FloatingBottomBarClearance),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                // ── Hero Section (Mockup 1 Signature: 2 large portrait cards side by side) ──
-                if (filteredItems.size >= 2) {
-                    item(span = { GridItemSpan(maxLineSpan) }, key = "featured_hero_row") {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 2.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        ) {
-                            PhotoThumbnail(
-                                item = filteredItems[0],
-                                isSelected = filteredItems[0].id in selectedIds,
-                                selectionMode = selectionMode,
-                                aspectRatio = 0.82f,
-                                cornerRadius = 24.dp,
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    if (selectionMode) {
-                                        viewModel.toggleSelected(filteredItems[0].id)
-                                    } else {
-                                        onOpenViewer(filteredItems[0].id, filteredItems)
-                                    }
-                                },
-                                onLongClick = {
-                                    if (!selectionMode) viewModel.enterSelection(filteredItems[0].id)
-                                },
-                                onToggleFavorite = { viewModel.toggleFavorite(filteredItems[0].id) },
-                            )
-                            PhotoThumbnail(
-                                item = filteredItems[1],
-                                isSelected = filteredItems[1].id in selectedIds,
-                                selectionMode = selectionMode,
-                                aspectRatio = 0.82f,
-                                cornerRadius = 24.dp,
-                                modifier = Modifier.weight(1f),
-                                onClick = {
-                                    if (selectionMode) {
-                                        viewModel.toggleSelected(filteredItems[1].id)
-                                    } else {
-                                        onOpenViewer(filteredItems[1].id, filteredItems)
-                                    }
-                                },
-                                onLongClick = {
-                                    if (!selectionMode) viewModel.enterSelection(filteredItems[1].id)
-                                },
-                                onToggleFavorite = { viewModel.toggleFavorite(filteredItems[1].id) },
-                            )
-                        }
-                    }
-                }
+            val gridHazeModifier = if (hazeState != null) {
+                Modifier.haze(hazeState)
+            } else Modifier
 
-                // ── Remaining Photos in 3-column rounded card grid ─────────────────────
-                val gridPhotos = if (filteredItems.size >= 2) filteredItems.drop(2) else filteredItems
-                items(gridPhotos, key = { it.id }) { item ->
-                    PhotoThumbnail(
-                        item = item,
-                        isSelected = item.id in selectedIds,
-                        selectionMode = selectionMode,
-                        aspectRatio = 1f,
-                        cornerRadius = 18.dp,
-                        onClick = {
-                            if (selectionMode) {
-                                viewModel.toggleSelected(item.id)
-                            } else {
-                                onOpenViewer(item.id, filteredItems)
-                            }
-                        },
-                        onLongClick = {
-                            if (!selectionMode) viewModel.enterSelection(item.id)
-                        },
-                        onToggleFavorite = { viewModel.toggleFavorite(item.id) },
-                    )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .then(gridHazeModifier),
+                contentPadding = PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = FloatingBottomBarClearance),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                groups.forEach { group ->
+                    item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.date}") {
+                        DateGroupHeader(
+                            group = group,
+                            selectionMode = selectionMode,
+                            isFullySelected = selectedIds.containsAll(group.items.map { it.id }),
+                            onToggleGroup = { viewModel.toggleGroupSelection(group.items.map { it.id }) },
+                        )
+                    }
+                    items(group.items, key = { it.id }) { item ->
+                        PhotoThumbnail(
+                            item = item,
+                            isSelected = item.id in selectedIds,
+                            selectionMode = selectionMode,
+                            onClick = {
+                                if (selectionMode) {
+                                    viewModel.toggleSelected(item.id)
+                                } else {
+                                    onOpenViewer(item.id, filteredItems)
+                                }
+                            },
+                            onLongClick = {
+                                if (!selectionMode) viewModel.enterSelection(item.id)
+                            },
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DateGroupHeader(
+    group: MediaDateGroup,
+    selectionMode: Boolean,
+    isFullySelected: Boolean,
+    onToggleGroup: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (selectionMode) {
+            Icon(
+                imageVector = if (isFullySelected) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
+                contentDescription = stringResource(R.string.action_select_all),
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable(onClick = onToggleGroup),
+                tint = if (isFullySelected) SelectionOverlay else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(start = 8.dp))
+        }
+        Text(
+            text = group.label,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+        androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = stringResource(R.string.photo_count, group.items.size),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
@@ -315,7 +320,7 @@ fun PhotoThumbnail(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     aspectRatio: Float = 1f,
-    cornerRadius: androidx.compose.ui.unit.Dp = 18.dp,
+    cornerRadius: androidx.compose.ui.unit.Dp = 10.dp,
     onToggleFavorite: (() -> Unit)? = null,
 ) {
     val scale by animateFloatAsState(
@@ -355,17 +360,17 @@ fun PhotoThumbnail(
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(6.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .padding(horizontal = 6.dp, vertical = 2.dp),
+                    .padding(4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.Black.copy(alpha = 0.55f))
+                    .padding(horizontal = 5.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     Icons.Rounded.PlayArrow,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(13.dp),
+                    modifier = Modifier.size(12.dp),
                 )
                 Text(
                     text = formatDuration(item.durationMs),
@@ -376,44 +381,26 @@ fun PhotoThumbnail(
             }
         }
 
-        // Iconic Frosted Circular Heart Badge (Mockup 1 signature)
-        if (!selectionMode) {
-            val badgePadding = if (cornerRadius > 20.dp) 10.dp else 6.dp
-            val badgeSize = if (cornerRadius > 20.dp) 32.dp else 26.dp
-            val iconSize = if (cornerRadius > 20.dp) 16.dp else 13.dp
-
-            Box(
+        // Discrete Favorite Badge (only shown for actual favorites, when not in selection mode)
+        if (item.isFavorite && !selectionMode) {
+            Icon(
+                imageVector = Icons.Rounded.Favorite,
+                contentDescription = null,
+                tint = Color(0xFFE05C5C),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(badgePadding)
-                    .size(badgeSize)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.88f))
-                    .clickable(
-                        enabled = onToggleFavorite != null,
-                        onClick = {
-                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                            onToggleFavorite?.invoke()
-                        },
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Favorite,
-                    contentDescription = "Toggle favorite",
-                    tint = if (item.isFavorite) com.gallery.ui.theme.SoftRoseHeart else com.gallery.ui.theme.SoftRoseHeartInactive.copy(alpha = 0.85f),
-                    modifier = Modifier.size(iconSize),
-                )
-            }
+                    .padding(5.dp)
+                    .size(16.dp),
+            )
         }
 
-        // Selection Dot
+        // Selection Radio Circle Indicator
         if (selectionMode) {
             SelectionDot(
                 isSelected = isSelected,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(8.dp),
+                    .padding(6.dp),
             )
         }
     }

@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import com.gallery.domain.model.MediaItem
 import com.gallery.ui.photos.PhotoThumbnail
 
+import dev.chrisbanes.haze.haze
+
 @Composable
 fun SimpleMediaGrid(
     items: List<MediaItem>,
@@ -32,12 +34,16 @@ fun SimpleMediaGrid(
         }
         return
     }
+
+    val hazeState = LocalHazeState.current
+    val hazeModifier = if (hazeState != null) Modifier.haze(hazeState) else Modifier
+
     LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 14.dp, top = 8.dp, end = 14.dp, bottom = FloatingBottomBarClearance),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        columns = GridCells.Fixed(4),
+        modifier = modifier.fillMaxSize().then(hazeModifier),
+        contentPadding = PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = FloatingBottomBarClearance),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(items, key = { it.id }) { item ->
             PhotoThumbnail(
@@ -45,7 +51,7 @@ fun SimpleMediaGrid(
                 isSelected = item.id in selectedIds,
                 selectionMode = selectionMode,
                 aspectRatio = 1f,
-                cornerRadius = 18.dp,
+                cornerRadius = 10.dp,
                 onClick = { onItemClick(item) },
                 onLongClick = { onItemLongClick(item) },
                 onToggleFavorite = { onToggleFavorite?.invoke(item) },

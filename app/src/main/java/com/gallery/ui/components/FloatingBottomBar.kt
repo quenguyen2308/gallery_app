@@ -43,7 +43,7 @@ import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeChild
 
 val LocalNavBarBottom = compositionLocalOf<Dp> { 0.dp }
-val LocalHazeState = compositionLocalOf { HazeState() }
+val LocalHazeState = compositionLocalOf<HazeState?> { null }
 
 val FloatingBottomBarClearance = 110.dp
 
@@ -55,10 +55,23 @@ val FloatingBottomBarClearance = 110.dp
 @Composable
 fun FloatingBottomBar(
     modifier: Modifier = Modifier,
+    hazeState: HazeState? = LocalHazeState.current,
     content: @Composable RowScope.() -> Unit,
 ) {
     val navBarBottom = LocalNavBarBottom.current
-    val hazeState = LocalHazeState.current
+
+    val dockBlurModifier = if (hazeState != null) {
+        Modifier.hazeChild(
+            state = hazeState,
+            style = HazeDefaults.style(
+                backgroundColor = Color.White.copy(alpha = 0.12f),
+                blurRadius = 24.dp,
+                noiseFactor = 0.03f,
+            ),
+        )
+    } else {
+        Modifier.background(Color.White.copy(alpha = 0.25f), CircleShape)
+    }
 
     Box(
         modifier = modifier
@@ -70,14 +83,7 @@ fun FloatingBottomBar(
                 spotColor = Color(0x20000000),
             )
             .clip(CircleShape)
-            .hazeChild(
-                state = hazeState,
-                style = HazeDefaults.style(
-                    backgroundColor = Color.White.copy(alpha = 0.12f),
-                    blurRadius = 24.dp,
-                    noiseFactor = 0.03f,
-                ),
-            )
+            .then(dockBlurModifier)
             .border(
                 BorderStroke(
                     1.2.dp,

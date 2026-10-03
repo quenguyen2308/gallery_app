@@ -160,8 +160,7 @@ fun GalleryApp() {
                 startDestination = GalleryDestinations.PHOTOS,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = padding.calculateTopPadding())
-                    .haze(hazeState),
+                    .padding(top = padding.calculateTopPadding()),
             ) {
                 composable(GalleryDestinations.PHOTOS) {
                     PhotosScreen(
