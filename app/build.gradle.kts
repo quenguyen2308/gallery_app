@@ -154,7 +154,7 @@ dependencies {
     implementation(libs.exifinterface)
     implementation(libs.fragment.ktx)
     implementation(libs.material.components)
-    implementation(libs.compose.cropper)
+    implementation(libs.android.image.cropper)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

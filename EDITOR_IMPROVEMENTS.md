@@ -95,8 +95,8 @@
 
 | Giai đoạn | Nội dung công việc | Ưu tiên | Trạng thái |
 | :--- | :--- | :---: | :---: |
-| **Giai đoạn 1** | **Sửa lỗi crash Haze** giữa `NavHost` và `FloatingBottomBar` trong Viewer & Editor | 🔴 Khẩn cấp | Chờ xử lý |
-| **Giai đoạn 2** | **Tái cấu trúc bố cục `EditorScreen`**: Cố định Bottom Tool Dock, giải phóng không gian cho các Sub-tool sliders và nút "Áp dụng" | 🔴 Khẩn cấp | Chờ xử lý |
-| **Giai đoạn 3** | **Sửa lỗi tỷ lệ khung vẽ cọ Magic Eraser** cho ảnh dọc & thêm nút Undo nét vẽ | 🟡 Cao | Chờ xử lý |
-| **Giai đoạn 4** | **Thêm tính năng So sánh Trước / Sau** & Zoom/Pan canvas khi biên tập | 🟡 Cao | Chờ xử lý |
-| **Giai đoạn 5** | **Bổ sung nút Cancel cho Gemini AI** & tối ưu hóa bộ nhớ Bitmap History | 🟢 Trung bình | Chờ xử lý |
+| **Giai đoạn 1** | **Sửa lỗi crash Haze** giữa `NavHost` và `FloatingBottomBar` trong Viewer & Editor | 🔴 Khẩn cấp | ✅ Đã hoàn thành |
+| **Giai đoạn 2** | **Tái cấu trúc bố cục `EditorScreen`**: Cố định Bottom Tool Dock, giải phóng không gian cho các Sub-tool sliders và nút "Áp dụng" | 🔴 Khẩn cấp | ✅ Đã hoàn thành |
+| **Giai đoạn 3** | **Sửa lỗi tỷ lệ khung vẽ cọ Magic Eraser** cho ảnh dọc & thêm nút Undo nét vẽ | 🟡 Cao | ✅ Đã hoàn thành |
+| **Giai đoạn 4** | **Thêm tính năng So sánh Trước / Sau** & Thay thư viện Cropper 8-handle touch | 🟡 Cao | ✅ Đã hoàn thành |
+| **Giai đoạn 5** | **Bổ sung nút Cancel cho Gemini AI** & tối ưu hóa bộ nhớ Bitmap History | 🟢 Trung bình | ✅ Đã hoàn thành |

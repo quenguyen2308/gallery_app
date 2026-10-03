@@ -235,7 +235,12 @@ fun EditorScreen(
                 }
             }
 
-            processingLabel?.let { label -> GeminiProcessingOverlay(label = label) }
+            processingLabel?.let { label ->
+                GeminiProcessingOverlay(
+                    label = label,
+                    onCancel = viewModel::cancelCurrentAiTask,
+                )
+            }
         }
     }
 

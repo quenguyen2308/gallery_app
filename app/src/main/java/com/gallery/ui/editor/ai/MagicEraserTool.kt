@@ -5,13 +5,21 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Undo
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -52,14 +60,27 @@ fun MagicEraserTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
     Column(modifier = modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier.weight(1f).fillMaxWidth().background(Color.Black),
+        BoxWithConstraints(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(Color.Black),
             contentAlignment = Alignment.Center,
         ) {
+            val containerWidth = maxWidth.value
+            val containerHeight = maxHeight.value
+            val imageAspect = bitmap.width.toFloat() / bitmap.height.toFloat().coerceAtLeast(1f)
+            val containerAspect = containerWidth / containerHeight.coerceAtLeast(1f)
+
+            val (boxWidth, boxHeight) = if (imageAspect > containerAspect) {
+                containerWidth.dp to (containerWidth / imageAspect).dp
+            } else {
+                (containerHeight * imageAspect).dp to containerHeight.dp
+            }
+
             Box(
                 modifier = Modifier
-                    .aspectRatio(bitmap.width.toFloat() / bitmap.height.toFloat())
-                    .fillMaxWidth()
+                    .size(boxWidth, boxHeight)
                     .onSizeChanged { canvasSize = it }
                     .pointerInput(bitmap) {
                         detectDragGestures(
@@ -100,7 +121,7 @@ fun MagicEraserTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
             )
         }
 
-        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp)) {
             Button(
                 onClick = {
                     val mask = buildMaskBitmap(
@@ -118,8 +139,29 @@ fun MagicEraserTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
             ) { Text(stringResource(R.string.erase_action)) }
         }
         if (strokes.isNotEmpty()) {
-            TextButton(onClick = { strokes.clear() }, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.erase_clear_strokes))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextButton(onClick = {
+                    if (strokes.isNotEmpty()) {
+                        strokes.removeAt(strokes.size - 1)
+                    }
+                }) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.Undo,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Hoàn tác nét")
+                }
+                TextButton(onClick = { strokes.clear() }) {
+                    Text(stringResource(R.string.erase_clear_strokes))
+                }
             }
         }
     }

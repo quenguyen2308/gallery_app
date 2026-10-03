@@ -139,8 +139,12 @@ class MediaStoreDataSource @Inject constructor(
         withContext(Dispatchers.IO) {
             val items = mutableListOf<MediaItem>()
             val sortOrder = "${MediaStore.Files.FileColumns.DATE_ADDED} DESC"
-            context.contentResolver.query(externalUri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
-                parseCursor(cursor, items)
+            try {
+                context.contentResolver.query(externalUri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
+                    parseCursor(cursor, items)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MediaStoreDataSource", "queryMedia failed", e)
             }
             items
         }

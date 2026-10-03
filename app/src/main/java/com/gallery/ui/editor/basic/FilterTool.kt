@@ -18,11 +18,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -40,11 +46,12 @@ import com.gallery.ui.editor.ImageEffects
 fun FilterTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
     val baseBitmap by viewModel.baseBitmap.collectAsStateWithLifecycle()
     val previewBaseBitmap by viewModel.previewBaseBitmap.collectAsStateWithLifecycle()
+    val initialBitmap by viewModel.initialBitmap.collectAsStateWithLifecycle()
     val matrix by viewModel.previewColorMatrix.collectAsStateWithLifecycle()
     val preset by viewModel.filterPreset.collectAsStateWithLifecycle()
     val intensity by viewModel.filterIntensity.collectAsStateWithLifecycle()
     val bitmap = previewBaseBitmap ?: baseBitmap ?: return
-    val imageBitmap = remember(bitmap) { bitmap.asImageBitmap() }
+    var isComparing by remember { mutableStateOf(false) }
     val thumbBitmap = remember(bitmap) {
         Bitmap.createScaledBitmap(bitmap, 72, 72, true).asImageBitmap()
     }
@@ -52,16 +59,63 @@ fun FilterTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.fillMaxSize()) {
         Box(
-            modifier = Modifier.weight(1f).fillMaxWidth().background(Color.Black),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(Color.Black)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            isComparing = true
+                            tryAwaitRelease()
+                            isComparing = false
+                        }
+                    )
+                },
             contentAlignment = Alignment.Center,
         ) {
+            val displayBitmap = if (isComparing && initialBitmap != null) initialBitmap!! else bitmap
+            val displayColorFilter = if (isComparing) null else ColorFilter.colorMatrix(matrix)
+
             Image(
-                bitmap = imageBitmap,
+                bitmap = displayBitmap.asImageBitmap(),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.colorMatrix(matrix),
+                colorFilter = displayColorFilter,
                 modifier = Modifier.fillMaxSize(),
             )
+
+            if (isComparing) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color.Black.copy(alpha = 0.75f),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 16.dp),
+                ) {
+                    Text(
+                        text = "Ảnh gốc (Original)",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                    )
+                }
+            } else {
+                Surface(
+                    shape = CircleShape,
+                    color = Color.Black.copy(alpha = 0.4f),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 12.dp),
+                ) {
+                    Text(
+                        text = "Nhấn giữ ảnh để so sánh",
+                        color = Color.White.copy(alpha = 0.85f),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    )
+                }
+            }
         }
 
         LazyRow(

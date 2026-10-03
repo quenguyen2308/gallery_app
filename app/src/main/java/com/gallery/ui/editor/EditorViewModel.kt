@@ -15,6 +15,7 @@ import com.gallery.util.isNetworkAvailable
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,6 +68,9 @@ class EditorViewModel @Inject constructor(
     private val _previewBaseBitmap = MutableStateFlow<Bitmap?>(null)
     val previewBaseBitmap: StateFlow<Bitmap?> = _previewBaseBitmap.asStateFlow()
 
+    private val _initialBitmap = MutableStateFlow<Bitmap?>(null)
+    val initialBitmap: StateFlow<Bitmap?> = _initialBitmap.asStateFlow()
+
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -118,6 +122,7 @@ class EditorViewModel @Inject constructor(
             history.clear()
             history.add(capped)
             historyIndex = 0
+            _initialBitmap.value = capped
             _baseBitmap.value = capped
             _previewBaseBitmap.value = capped
             resetTransientParams()
@@ -265,27 +270,42 @@ class EditorViewModel @Inject constructor(
             "recognizable. Return only the resulting image.",
     )
 
+    private var currentAiJob: Job? = null
+
+    fun cancelCurrentAiTask() {
+        currentAiJob?.cancel()
+        currentAiJob = null
+        _processingLabel.value = null
+        _isBusy.value = false
+    }
+
     private fun runGeminiOperation(
         cacheKeySuffix: String,
         label: String,
         prompt: String,
         extraImages: List<Bitmap> = emptyList(),
-    ) = viewModelScope.launch {
-        commitCurrentEditsSuspend()
-        val base = _baseBitmap.value ?: return@launch
+    ) {
+        currentAiJob?.cancel()
+        currentAiJob = viewModelScope.launch {
+            commitCurrentEditsSuspend()
+            val base = _baseBitmap.value ?: return@launch
 
-        if (!isNetworkAvailable(context)) {
-            _events.send(EditorEvent.Message(context.getString(R.string.msg_network_required)))
-            return@launch
-        }
+            if (!isNetworkAvailable(context)) {
+                _events.send(EditorEvent.Message(context.getString(R.string.msg_network_required)))
+                return@launch
+            }
 
-        _processingLabel.value = label
-        val cacheKey = "$historyVersion:$cacheKeySuffix"
-        when (val result = geminiRepository.editImage(cacheKey, prompt, listOf(base) + extraImages)) {
-            is GeminiResult.Success -> pushHistory(result.bitmap)
-            is GeminiResult.Error -> _events.send(EditorEvent.Message(result.message))
+            _processingLabel.value = label
+            val cacheKey = "$historyVersion:$cacheKeySuffix"
+            try {
+                when (val result = geminiRepository.editImage(cacheKey, prompt, listOf(base) + extraImages)) {
+                    is GeminiResult.Success -> pushHistory(result.bitmap)
+                    is GeminiResult.Error -> _events.send(EditorEvent.Message(result.message))
+                }
+            } finally {
+                _processingLabel.value = null
+            }
         }
-        _processingLabel.value = null
     }
 
     private fun resetTransientParams() {
@@ -311,5 +331,14 @@ class EditorViewModel @Inject constructor(
     private fun updateUndoRedoFlags() {
         _canUndo.value = historyIndex > 0
         _canRedo.value = historyIndex < history.size - 1
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        currentAiJob?.cancel()
+        history.clear()
+        _baseBitmap.value = null
+        _previewBaseBitmap.value = null
+        _initialBitmap.value = null
     }
 }

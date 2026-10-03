@@ -1,5 +1,8 @@
 package com.gallery.ui.editor.basic
 
+import android.graphics.Bitmap
+import android.graphics.Color as AndroidColor
+import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,15 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material.icons.automirrored.rounded.RotateLeft
 import androidx.compose.material.icons.automirrored.rounded.RotateRight
+import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,52 +31,49 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.canhub.cropper.CropImageView
 import com.gallery.R
 import com.gallery.ui.editor.EditorViewModel
-import com.smarttoolfactory.cropper.ImageCropper
-import com.smarttoolfactory.cropper.model.AspectRatio
-import com.smarttoolfactory.cropper.model.OutlineType
-import com.smarttoolfactory.cropper.model.RectCropShape
-import com.smarttoolfactory.cropper.settings.CropDefaults
-import com.smarttoolfactory.cropper.settings.CropOutlineProperty
 
-private data class RatioOption(val label: String, val ratio: AspectRatio?)
+private data class RatioOption(val label: String, val aspectX: Int?, val aspectY: Int?)
 
 @Composable
 fun CropRotateTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
     val baseBitmap by viewModel.baseBitmap.collectAsStateWithLifecycle()
     val bitmap = baseBitmap ?: return
-    val imageBitmap = remember(bitmap) { bitmap.asImageBitmap() }
 
     val freeLabel = stringResource(R.string.crop_ratio_free)
     val ratioOptions = remember(freeLabel) {
         listOf(
-            RatioOption(freeLabel, null),
-            RatioOption("1:1", AspectRatio(1f)),
-            RatioOption("16:9", AspectRatio(16f / 9f)),
-            RatioOption("4:3", AspectRatio(4f / 3f)),
-            RatioOption("3:2", AspectRatio(3f / 2f)),
+            RatioOption(freeLabel, null, null),
+            RatioOption("1:1", 1, 1),
+            RatioOption("16:9", 16, 9),
+            RatioOption("4:3", 4, 3),
+            RatioOption("3:2", 3, 2),
         )
     }
     var selectedRatio by remember(freeLabel) { mutableStateOf(ratioOptions[0]) }
-    var triggerCrop by remember { mutableStateOf(false) }
+    var cropImageViewRef by remember { mutableStateOf<CropImageView?>(null) }
 
-    val handleSizePx = with(LocalDensity.current) { 20.dp.toPx() }
-    val cropProperties = remember(selectedRatio, handleSizePx) {
-        CropDefaults.properties(
-            handleSize = handleSizePx,
-            cropOutlineProperty = CropOutlineProperty(OutlineType.Rect, RectCropShape(0, "Rect")),
-            aspectRatio = selectedRatio.ratio ?: AspectRatio.Original,
-            fixedAspectRatio = selectedRatio.ratio != null,
-        )
+    LaunchedEffect(bitmap) {
+        cropImageViewRef?.setImageBitmap(bitmap)
     }
-    val cropStyle = remember { CropDefaults.style() }
+
+    LaunchedEffect(selectedRatio) {
+        cropImageViewRef?.let { view ->
+            if (selectedRatio.aspectX != null && selectedRatio.aspectY != null) {
+                view.setAspectRatio(selectedRatio.aspectX!!, selectedRatio.aspectY!!)
+                view.setFixedAspectRatio(true)
+            } else {
+                view.clearAspectRatio()
+                view.setFixedAspectRatio(false)
+            }
+        }
+    }
 
     Column(modifier = modifier.fillMaxSize()) {
         Box(
@@ -81,17 +82,27 @@ fun CropRotateTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .background(Color.Black),
         ) {
-            ImageCropper(
+            AndroidView(
                 modifier = Modifier.fillMaxSize(),
-                imageBitmap = imageBitmap,
-                contentDescription = null,
-                cropStyle = cropStyle,
-                cropProperties = cropProperties,
-                crop = triggerCrop,
-                onCropStart = {},
-                onCropSuccess = { cropped ->
-                    triggerCrop = false
-                    viewModel.applyCrop(cropped.asAndroidBitmap())
+                factory = { context ->
+                    CropImageView(context).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                        )
+                        setBackgroundColor(AndroidColor.BLACK)
+                        guidelines = CropImageView.Guidelines.ON
+                        cropShape = CropImageView.CropShape.RECTANGLE
+                        isAutoZoomEnabled = true
+                        setMultiTouchEnabled(true)
+                        setCenterMoveEnabled(true)
+                        isShowProgressBar = false
+                        setImageBitmap(bitmap)
+                        cropImageViewRef = this
+                    }
+                },
+                update = { view ->
+                    cropImageViewRef = view
                 },
             )
         }
@@ -114,23 +125,38 @@ fun CropRotateTool(viewModel: EditorViewModel, modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-            IconButton(onClick = { viewModel.rotate(clockwise = false) }) {
+            IconButton(onClick = {
+                cropImageViewRef?.rotateImage(-90)
+            }) {
                 Icon(Icons.AutoMirrored.Rounded.RotateLeft, contentDescription = stringResource(R.string.crop_rotate_left))
             }
-            IconButton(onClick = { viewModel.rotate(clockwise = true) }) {
+            IconButton(onClick = {
+                cropImageViewRef?.rotateImage(90)
+            }) {
                 Icon(Icons.AutoMirrored.Rounded.RotateRight, contentDescription = stringResource(R.string.crop_rotate_right))
             }
-            IconButton(onClick = { viewModel.flip(horizontal = true) }) {
+            IconButton(onClick = {
+                cropImageViewRef?.flipImageHorizontally()
+            }) {
                 Icon(Icons.Rounded.Flip, contentDescription = stringResource(R.string.crop_flip_horizontal))
             }
-            IconButton(onClick = { viewModel.flip(horizontal = false) }) {
+            IconButton(onClick = {
+                cropImageViewRef?.flipImageVertically()
+            }) {
                 Icon(
                     Icons.Rounded.Flip,
                     contentDescription = stringResource(R.string.crop_flip_vertical),
                     modifier = Modifier.rotate(90f),
                 )
             }
-            Button(onClick = { triggerCrop = true }) { Text(stringResource(R.string.crop_apply)) }
+            Button(onClick = {
+                val cropped: Bitmap? = cropImageViewRef?.getCroppedImage()
+                if (cropped != null) {
+                    viewModel.applyCrop(cropped)
+                }
+            }) {
+                Text(stringResource(R.string.crop_apply))
+            }
         }
     }
 }
