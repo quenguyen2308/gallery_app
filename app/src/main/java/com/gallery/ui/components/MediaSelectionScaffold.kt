@@ -132,7 +132,7 @@ fun MediaSelectionScaffold(
             content(padding)
             AnimatedVisibility(
                 visible = selectionMode && selectedItems.isNotEmpty(),
-                modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
+                modifier = Modifier.align(Alignment.BottomCenter),
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {

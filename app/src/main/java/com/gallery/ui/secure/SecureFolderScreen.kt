@@ -145,7 +145,7 @@ fun SecureFolderScreen(
             if (selectionMode && safeIds.isNotEmpty()) {
                 com.gallery.ui.selection.SecureSelectionActionBar(
                     onRestore = { viewModel.restoreFromSecureFolder(safeIds) },
-                    modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
+                    modifier = Modifier.align(Alignment.BottomCenter),
                 )
             }
         }

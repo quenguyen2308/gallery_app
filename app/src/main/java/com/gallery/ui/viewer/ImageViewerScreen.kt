@@ -102,7 +102,7 @@ fun ImageViewerScreen(
 
         currentItem?.let { item ->
             FloatingBottomBar(
-                modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
+                modifier = Modifier.align(Alignment.BottomCenter),
             ) {
                 PillActionItem(
                     icon = Icons.Rounded.Share,

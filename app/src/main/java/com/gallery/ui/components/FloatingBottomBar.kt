@@ -35,6 +35,7 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,36 +75,44 @@ fun FloatingBottomBar(
     }
 
     Box(
-        modifier = modifier
-            .padding(bottom = navBarBottom + 12.dp)
-            .shadow(
-                elevation = 12.dp,
-                shape = CircleShape,
-                ambientColor = Color(0x25000000),
-                spotColor = Color(0x20000000),
-            )
-            .clip(CircleShape)
-            .then(dockBlurModifier)
-            .border(
-                BorderStroke(
-                    1.2.dp,
-                    Brush.verticalGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.85f),
-                            Color.White.copy(alpha = 0.30f),
-                        )
-                    )
-                ),
-                CircleShape,
-            )
-            .padding(horizontal = 4.dp, vertical = 2.dp),
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically,
-            content = content,
-        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .widthIn(max = 380.dp)
+                .fillMaxWidth()
+                .padding(bottom = navBarBottom + 12.dp)
+                .shadow(
+                    elevation = 12.dp,
+                    shape = CircleShape,
+                    ambientColor = Color(0x25000000),
+                    spotColor = Color(0x20000000),
+                )
+                .clip(CircleShape)
+                .then(dockBlurModifier)
+                .border(
+                    BorderStroke(
+                        1.2.dp,
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.White.copy(alpha = 0.85f),
+                                Color.White.copy(alpha = 0.30f),
+                            )
+                        )
+                    ),
+                    CircleShape,
+                )
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                content = content,
+            )
+        }
     }
 }
 

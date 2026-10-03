@@ -180,7 +180,7 @@ fun EditorScreen(
             }
 
             if (topTab == EditorTopTab.BASIC) {
-                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()) {
+                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter)) {
                     PillNavItem(
                         selected = basicTool == BasicTool.CROP,
                         icon = Icons.Rounded.Crop,
@@ -201,7 +201,7 @@ fun EditorScreen(
                     )
                 }
             } else {
-                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()) {
+                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter)) {
                     PillNavItem(
                         selected = aiTool == AiTool.ERASER,
                         icon = Icons.Rounded.AutoFixHigh,

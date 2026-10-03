@@ -22,9 +22,7 @@ fun GalleryBottomNav(navController: NavController, modifier: Modifier = Modifier
     val currentRoute = backStackEntry?.destination?.route
 
     FloatingBottomBar(
-        modifier = modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth(),
+        modifier = modifier,
     ) {
         val isPhotos = currentRoute == GalleryDestinations.PHOTOS
         val isAlbums = currentRoute == GalleryDestinations.ALBUMS

@@ -183,7 +183,7 @@ fun TrashScreen(
 
             AnimatedVisibility(
                 visible = selectionMode && safeIds.isNotEmpty(),
-                modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth(),
+                modifier = Modifier.align(Alignment.BottomCenter),
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
