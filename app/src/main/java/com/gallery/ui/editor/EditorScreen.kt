@@ -2,6 +2,7 @@ package com.gallery.ui.editor
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -116,6 +117,7 @@ fun EditorScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
@@ -146,7 +148,11 @@ fun EditorScreen(
             return@Scaffold
         }
 
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .padding(top = padding.calculateTopPadding())
+                .fillMaxSize(),
+        ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 TabRow(selectedTabIndex = topTab.ordinal) {
                     Tab(
@@ -177,55 +183,55 @@ fun EditorScreen(
                         }
                     }
                 }
-            }
 
-            if (topTab == EditorTopTab.BASIC) {
-                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    PillNavItem(
-                        selected = basicTool == BasicTool.CROP,
-                        icon = Icons.Rounded.Crop,
-                        label = stringResource(R.string.editor_tool_crop),
-                        onClick = { basicTool = BasicTool.CROP },
-                    )
-                    PillNavItem(
-                        selected = basicTool == BasicTool.ADJUST,
-                        icon = Icons.Rounded.Tune,
-                        label = stringResource(R.string.editor_tool_adjust),
-                        onClick = { basicTool = BasicTool.ADJUST },
-                    )
-                    PillNavItem(
-                        selected = basicTool == BasicTool.FILTER,
-                        icon = Icons.Rounded.FilterVintage,
-                        label = stringResource(R.string.editor_tool_filter),
-                        onClick = { basicTool = BasicTool.FILTER },
-                    )
-                }
-            } else {
-                FloatingBottomBar(modifier = Modifier.align(Alignment.BottomCenter)) {
-                    PillNavItem(
-                        selected = aiTool == AiTool.ERASER,
-                        icon = Icons.Rounded.AutoFixHigh,
-                        label = stringResource(R.string.editor_tool_erase),
-                        onClick = { aiTool = AiTool.ERASER },
-                    )
-                    PillNavItem(
-                        selected = aiTool == AiTool.BACKGROUND,
-                        icon = Icons.Rounded.Wallpaper,
-                        label = stringResource(R.string.editor_tool_background),
-                        onClick = { aiTool = AiTool.BACKGROUND },
-                    )
-                    PillNavItem(
-                        selected = aiTool == AiTool.ENHANCE,
-                        icon = Icons.Rounded.HighQuality,
-                        label = stringResource(R.string.editor_tool_enhance),
-                        onClick = { aiTool = AiTool.ENHANCE },
-                    )
-                    PillNavItem(
-                        selected = aiTool == AiTool.STYLE,
-                        icon = Icons.Rounded.Palette,
-                        label = stringResource(R.string.editor_tool_style),
-                        onClick = { aiTool = AiTool.STYLE },
-                    )
+                if (topTab == EditorTopTab.BASIC) {
+                    FloatingBottomBar(modifier = Modifier.padding(top = 4.dp)) {
+                        PillNavItem(
+                            selected = basicTool == BasicTool.CROP,
+                            icon = Icons.Rounded.Crop,
+                            label = stringResource(R.string.editor_tool_crop),
+                            onClick = { basicTool = BasicTool.CROP },
+                        )
+                        PillNavItem(
+                            selected = basicTool == BasicTool.ADJUST,
+                            icon = Icons.Rounded.Tune,
+                            label = stringResource(R.string.editor_tool_adjust),
+                            onClick = { basicTool = BasicTool.ADJUST },
+                        )
+                        PillNavItem(
+                            selected = basicTool == BasicTool.FILTER,
+                            icon = Icons.Rounded.FilterVintage,
+                            label = stringResource(R.string.editor_tool_filter),
+                            onClick = { basicTool = BasicTool.FILTER },
+                        )
+                    }
+                } else {
+                    FloatingBottomBar(modifier = Modifier.padding(top = 4.dp)) {
+                        PillNavItem(
+                            selected = aiTool == AiTool.ERASER,
+                            icon = Icons.Rounded.AutoFixHigh,
+                            label = stringResource(R.string.editor_tool_erase),
+                            onClick = { aiTool = AiTool.ERASER },
+                        )
+                        PillNavItem(
+                            selected = aiTool == AiTool.BACKGROUND,
+                            icon = Icons.Rounded.Wallpaper,
+                            label = stringResource(R.string.editor_tool_background),
+                            onClick = { aiTool = AiTool.BACKGROUND },
+                        )
+                        PillNavItem(
+                            selected = aiTool == AiTool.ENHANCE,
+                            icon = Icons.Rounded.HighQuality,
+                            label = stringResource(R.string.editor_tool_enhance),
+                            onClick = { aiTool = AiTool.ENHANCE },
+                        )
+                        PillNavItem(
+                            selected = aiTool == AiTool.STYLE,
+                            icon = Icons.Rounded.Palette,
+                            label = stringResource(R.string.editor_tool_style),
+                            onClick = { aiTool = AiTool.STYLE },
+                        )
+                    }
                 }
             }
 
