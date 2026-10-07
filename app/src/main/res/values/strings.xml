@@ -68,6 +68,12 @@
     <string name="date_today">Hôm nay</string>
     <string name="date_yesterday">Hôm qua</string>
 
+    <!-- Density View Mode (Fluid Vision Glass) -->
+    <string name="density_years">Năm</string>
+    <string name="density_months">Tháng</string>
+    <string name="density_days">Ngày</string>
+    <string name="density_all">Tất cả</string>
+
     <!-- Photo count -->
     <string name="photo_count">%1$d ảnh</string>
 

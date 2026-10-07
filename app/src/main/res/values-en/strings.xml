@@ -19,6 +19,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_more">More</string>
     <string name="action_select_all">Select all</string>
+    <string name="action_select">Select</string>
     <string name="action_rename">Rename</string>
     <string name="action_details">View details</string>
     <string name="action_set_wallpaper">Set as wallpaper</string>
@@ -61,6 +62,12 @@
     <!-- Date grouping -->
     <string name="date_today">Today</string>
     <string name="date_yesterday">Yesterday</string>
+
+    <!-- Density View Mode (Fluid Vision Glass) -->
+    <string name="density_years">Years</string>
+    <string name="density_months">Months</string>
+    <string name="density_days">Days</string>
+    <string name="density_all">All</string>
 
     <!-- Photo count -->
     <string name="photo_count">%1$d photos</string>

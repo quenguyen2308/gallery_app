@@ -39,7 +39,12 @@ fun SelectionTopBar(
     onToggleSelectAll: () -> Unit,
 ) {
     TopAppBar(
-        title = { Text(stringResource(R.string.items_selected, selectedCount)) },
+        title = {
+            Text(
+                text = stringResource(R.string.items_selected, selectedCount),
+                modifier = Modifier.clickable(onClick = onToggleSelectAll),
+            )
+        },
         navigationIcon = {
             Icon(
                 imageVector = if (isAllSelected) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,

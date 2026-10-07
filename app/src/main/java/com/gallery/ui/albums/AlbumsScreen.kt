@@ -95,7 +95,17 @@ fun AlbumsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    Text(
+                        text = stringResource(R.string.all_albums),
+                        style = androidx.compose.ui.text.TextStyle(
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 24.sp,
+                            letterSpacing = (-0.5).sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        ),
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -218,19 +228,6 @@ private fun AlbumsGrid(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Text(
-                text = stringResource(R.string.all_albums),
-                style = androidx.compose.ui.text.TextStyle(
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 28.sp,
-                    color = Color(0xFF2E2428),
-                    letterSpacing = (-0.5).sp,
-                ),
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
-            )
-        }
         item {
             SystemAlbumGridCard(
                 name = stringResource(R.string.trash_title),
@@ -283,14 +280,6 @@ private fun AlbumsList(
         modifier = Modifier.fillMaxSize().padding(padding).then(hazeModifier),
         contentPadding = PaddingValues(bottom = FloatingBottomBarClearance),
     ) {
-        item {
-            Text(
-                text = stringResource(R.string.all_albums),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            )
-        }
         item {
             SystemAlbumListRow(
                 name = stringResource(R.string.trash_title),

@@ -1,7 +1,13 @@
 package com.gallery.ui.photos
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -37,10 +44,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import com.gallery.ui.theme.SoftRosePrimary
-import com.gallery.ui.theme.SoftRoseHeart
-import com.gallery.ui.theme.SoftRoseHeartInactive
-import com.gallery.ui.theme.SoftRoseCardBorder
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,6 +59,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,11 +71,14 @@ import com.gallery.R
 import com.gallery.domain.model.MediaItem
 import com.gallery.ui.GalleryViewModel
 import com.gallery.ui.components.FloatingBottomBarClearance
+import com.gallery.ui.components.LocalHazeState
 import com.gallery.ui.components.MediaSelectionScaffold
 import com.gallery.ui.theme.FilterChipShape
 import com.gallery.ui.theme.LocalExtendedColors
 import com.gallery.ui.theme.SelectionOverlay
-import com.gallery.ui.theme.ThumbnailShape
+import com.gallery.ui.theme.SoftRoseCardBorder
+import com.gallery.ui.theme.SoftRoseHeart
+import com.gallery.ui.theme.SoftRosePrimary
 import com.gallery.util.MediaDateGroup
 import com.gallery.util.groupMediaByDate
 import dev.chrisbanes.haze.haze
@@ -106,9 +114,11 @@ fun PhotosScreen(
         }
     }
 
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val groups = remember(filteredItems) { groupMediaByDate(filteredItems, context) }
-    val hazeState = com.gallery.ui.components.LocalHazeState.current
+    val context = LocalContext.current
+    val groups = remember(filteredItems) {
+        groupMediaByDate(filteredItems, context)
+    }
+    val hazeState = LocalHazeState.current
 
     MediaSelectionScaffold(
         viewModel = viewModel,
@@ -118,32 +128,55 @@ fun PhotosScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(start = 18.dp, end = 12.dp, top = 8.dp, bottom = 4.dp),
+                    .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 4.dp),
             ) {
+                // Top Header Row: Title & Action Controls
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "My Memories",
+                        text = stringResource(R.string.nav_photos),
                         style = androidx.compose.ui.text.TextStyle(
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 30.sp,
-                            color = Color(0xFF2E2428),
-                            letterSpacing = (-0.5).sp,
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Default,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 28.sp,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            letterSpacing = (-0.6).sp,
                         ),
                     )
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        // Quick Select Button (Fluid Glass pill)
+                        if (!selectionMode && filteredItems.isNotEmpty()) {
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                                border = BorderStroke(1.dp, SoftRoseCardBorder),
+                                modifier = Modifier.clickable {
+                                    viewModel.enterSelection(filteredItems.first().id)
+                                },
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.action_select),
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = SoftRosePrimary,
+                                        fontSize = 12.5.sp,
+                                    ),
+                                )
+                            }
+                        }
+
                         IconButton(onClick = { showFilters = !showFilters }) {
                             Icon(
                                 imageVector = Icons.Rounded.Search,
                                 contentDescription = "Search & Filter",
-                                tint = if (showFilters) SoftRosePrimary else Color(0xFF4A3E42),
+                                tint = if (showFilters) SoftRosePrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(24.dp),
                             )
                         }
@@ -159,10 +192,10 @@ fun PhotosScreen(
                 }
 
                 // Smooth slide-down filter chips when Search/Filter is activated
-                androidx.compose.animation.AnimatedVisibility(
+                AnimatedVisibility(
                     visible = showFilters,
-                    enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
-                    exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut(),
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut(),
                 ) {
                     Row(
                         modifier = Modifier
@@ -229,18 +262,24 @@ fun PhotosScreen(
                 Modifier.haze(hazeState)
             } else Modifier
 
+            // Fluid Edge-to-Edge Photo Wall Grid (tight 2dp spacing, 4 columns)
             LazyVerticalGrid(
                 columns = GridCells.Fixed(4),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .then(gridHazeModifier),
-                contentPadding = PaddingValues(start = 6.dp, top = 6.dp, end = 6.dp, bottom = FloatingBottomBarClearance),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                contentPadding = PaddingValues(
+                    start = 2.dp,
+                    top = 2.dp,
+                    end = 2.dp,
+                    bottom = FloatingBottomBarClearance,
+                ),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 groups.forEach { group ->
-                    item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.date}") {
+                    item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.key}") {
                         DateGroupHeader(
                             group = group,
                             selectionMode = selectionMode,
@@ -253,6 +292,8 @@ fun PhotosScreen(
                             item = item,
                             isSelected = item.id in selectedIds,
                             selectionMode = selectionMode,
+                            cornerRadius = 4.dp,
+                            showDurationText = true,
                             onClick = {
                                 if (selectionMode) {
                                     viewModel.toggleSelected(item.id)
@@ -281,32 +322,49 @@ fun DateGroupHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .then(
+                if (selectionMode) {
+                    Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(onClick = onToggleGroup)
+                } else Modifier
+            )
+            .padding(
+                start = 8.dp,
+                end = 8.dp,
+                top = 10.dp,
+                bottom = 4.dp,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (selectionMode) {
             Icon(
                 imageVector = if (isFullySelected) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
                 contentDescription = stringResource(R.string.action_select_all),
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(onClick = onToggleGroup),
+                modifier = Modifier.size(22.dp),
                 tint = if (isFullySelected) SelectionOverlay else MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(start = 8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
         }
+
         Text(
             text = group.label,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp,
+            ),
             color = MaterialTheme.colorScheme.onBackground,
         )
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = stringResource(R.string.photo_count, group.items.size),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        group.subLabel?.let { sub ->
+            Text(
+                text = sub,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -320,7 +378,8 @@ fun PhotoThumbnail(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     aspectRatio: Float = 1f,
-    cornerRadius: androidx.compose.ui.unit.Dp = 10.dp,
+    cornerRadius: androidx.compose.ui.unit.Dp = 4.dp,
+    showDurationText: Boolean = true,
     onToggleFavorite: (() -> Unit)? = null,
 ) {
     val scale by animateFloatAsState(
@@ -328,13 +387,12 @@ fun PhotoThumbnail(
         animationSpec = tween(150),
         label = "thumbnailScale",
     )
-    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val haptic = LocalHapticFeedback.current
 
     Box(
         modifier = modifier
             .aspectRatio(aspectRatio)
             .clip(RoundedCornerShape(cornerRadius))
-            .border(androidx.compose.foundation.BorderStroke(1.dp, com.gallery.ui.theme.SoftRoseCardBorder), RoundedCornerShape(cornerRadius))
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = {
@@ -355,15 +413,15 @@ fun PhotoThumbnail(
                 .clip(RoundedCornerShape(cornerRadius)),
         )
 
-        // Video Duration Badge
+        // Video Duration / Play Badge
         if (item.isVideo) {
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(4.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Black.copy(alpha = 0.55f))
-                    .padding(horizontal = 5.dp, vertical = 2.dp),
+                    .padding(3.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.Black.copy(alpha = 0.58f))
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -372,16 +430,18 @@ fun PhotoThumbnail(
                     tint = Color.White,
                     modifier = Modifier.size(12.dp),
                 )
-                Text(
-                    text = formatDuration(item.durationMs),
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 10.sp,
-                )
+                if (showDurationText) {
+                    Text(
+                        text = formatDuration(item.durationMs),
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontSize = 9.5.sp,
+                    )
+                }
             }
         }
 
-        // Discrete Favorite Badge (only shown for actual favorites, when not in selection mode)
+        // Discrete Favorite Badge
         if (item.isFavorite && !selectionMode) {
             Icon(
                 imageVector = Icons.Rounded.Favorite,
@@ -389,8 +449,8 @@ fun PhotoThumbnail(
                 tint = Color(0xFFE05C5C),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(5.dp)
-                    .size(16.dp),
+                    .padding(4.dp)
+                    .size(14.dp),
             )
         }
 
@@ -400,7 +460,7 @@ fun PhotoThumbnail(
                 isSelected = isSelected,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(6.dp),
+                    .padding(4.dp),
             )
         }
     }
@@ -410,7 +470,7 @@ fun PhotoThumbnail(
 fun SelectionDot(isSelected: Boolean, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .size(24.dp)
+            .size(22.dp)
             .background(
                 color = if (isSelected) SelectionOverlay else Color.Black.copy(alpha = 0.35f),
                 shape = CircleShape,
@@ -427,7 +487,7 @@ fun SelectionDot(isSelected: Boolean, modifier: Modifier = Modifier) {
                 Icons.Rounded.Check,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(15.dp),
+                modifier = Modifier.size(14.dp),
             )
         }
     }

@@ -65,13 +65,13 @@ fun FloatingBottomBar(
         Modifier.hazeChild(
             state = hazeState,
             style = HazeDefaults.style(
-                backgroundColor = Color.White.copy(alpha = 0.12f),
-                blurRadius = 24.dp,
-                noiseFactor = 0.03f,
+                backgroundColor = Color.White.copy(alpha = 0.85f),
+                blurRadius = 28.dp,
+                noiseFactor = 0.04f,
             ),
         )
     } else {
-        Modifier.background(Color.White.copy(alpha = 0.25f), CircleShape)
+        Modifier.background(Color.White.copy(alpha = 0.90f), CircleShape)
     }
 
     Box(
@@ -87,8 +87,8 @@ fun FloatingBottomBar(
                 .shadow(
                     elevation = 12.dp,
                     shape = CircleShape,
-                    ambientColor = Color(0x25000000),
-                    spotColor = Color(0x20000000),
+                    ambientColor = Color(0x35000000),
+                    spotColor = Color(0x25000000),
                 )
                 .clip(CircleShape)
                 .then(dockBlurModifier)
@@ -97,8 +97,8 @@ fun FloatingBottomBar(
                         1.2.dp,
                         Brush.verticalGradient(
                             listOf(
-                                Color.White.copy(alpha = 0.85f),
-                                Color.White.copy(alpha = 0.30f),
+                                Color.White.copy(alpha = 0.95f),
+                                Color(0x38FFA8BA),
                             )
                         )
                     ),
@@ -130,7 +130,7 @@ fun RowScope.PillNavItem(
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val roseColor = Color(0xFFE27E8F)
+    val roseColor = Color(0xFFD64D6C)
     val inactiveColor = Color(0xFF363236)
 
     val contentColor by animateColorAsState(
@@ -139,12 +139,12 @@ fun RowScope.PillNavItem(
         label = "navColor",
     )
     val activeBgColor by animateColorAsState(
-        targetValue = if (selected) Color.White.copy(alpha = 0.32f) else Color.Transparent,
+        targetValue = if (selected) Color(0xFFFFEBF0) else Color.Transparent,
         animationSpec = tween(180),
         label = "activeBgColor",
     )
     val activeBorderColor by animateColorAsState(
-        targetValue = if (selected) Color.White.copy(alpha = 0.65f) else Color.Transparent,
+        targetValue = if (selected) Color(0xFFFFB3C6).copy(alpha = 0.70f) else Color.Transparent,
         animationSpec = tween(180),
         label = "activeBorderColor",
     )
@@ -218,7 +218,7 @@ fun RowScope.PillActionItem(
     onClick: () -> Unit,
     tint: Color? = null,
 ) {
-    val effectiveTint = tint ?: Color(0xFFE27E8F)
+    val effectiveTint = tint ?: Color(0xFF363236)
     Box(
         modifier = Modifier
             .clip(CircleShape)

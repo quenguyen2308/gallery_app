@@ -3,7 +3,10 @@ package com.gallery.ui.viewer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -17,6 +20,7 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -81,7 +85,30 @@ fun ImageViewerScreen(
         }
 
         TopAppBar(
-            title = { },
+            title = {
+                currentItem?.let { item ->
+                    val dateStr = remember(item.dateTakenMillis) {
+                        val instant = java.time.Instant.ofEpochMilli(item.dateTakenMillis)
+                        val zonedDateTime = instant.atZone(java.time.ZoneId.systemDefault())
+                        val formatter = java.time.format.DateTimeFormatter.ofPattern("d MMM, yyyy • HH:mm", java.util.Locale.getDefault())
+                        zonedDateTime.format(formatter)
+                    }
+                    androidx.compose.material3.Surface(
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                        color = Color.Black.copy(alpha = 0.40f),
+                    ) {
+                        androidx.compose.material3.Text(
+                            text = dateStr,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color = Color.White,
+                                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                                fontSize = 12.sp,
+                            ),
+                        )
+                    }
+                }
+            },
             navigationIcon = {
                 IconButton(onClick = onBack) {
                     Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null, tint = Color.White)
